@@ -1,0 +1,394 @@
+
+header {
+  width: 100%;
+  height: 100px;
+  display: grid;
+  grid-template-rows: 40px 60px;
+  border-bottom: 1px solid gray;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+.mas2h22{
+  display: none;
+}
+.hnone{
+  display: none;
+  width: 10%;
+}
+#h1 {
+  background-color: #083f58;
+  display: flex;
+  justify-content: space-around;
+}
+#mas1h {
+  display: grid;
+  grid-template-columns: auto auto auto;
+}
+#mas2h {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+}
+#h111 {
+  background-color: #3d5a76;
+}
+.h11 {
+  width: 200px;
+  height: 100%;
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #083f58;
+  transition: 1s;
+  text-decoration: none;
+}
+.h11:hover {
+  background-color: #3d5a76;
+  transition: 1s;
+}
+#h113 {
+  display: flex;
+}
+.h21 {
+  width: 100px;
+  height: 100%;
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #083f58;
+  transition: 1s;
+  border-right: 1px solid gray;
+}
+.h21:hover {
+  color: red;
+  transition: 1s;
+}
+#h222 {
+  width: 200px;
+  color: white;
+}
+#h2222 {
+  color: white;
+}
+.imglogo {
+  width: 100px;
+  height: 40px;
+  margin-top: 10px;
+  color: #2c3843;
+  background-image: url("https://www.telecomarmenia.am/img/logo-light.svg?v=1");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+#h2 {
+  background-color: white;
+  display: flex;
+  justify-content: space-around;
+}
+#mas2i1 {
+  display: flex;
+}
+.h22 {
+  width: 100px;
+  height: 100%;
+  color: #2c3843;
+  font-size: 16px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  transition: 1s;
+}
+.h22:hover {
+  background-color: whitesmoke;
+  transition: 1s;
+}
+#mas2i2 {
+  width: 150px;
+  height: 100%;
+  display: flex;
+  color: #2c3843;
+  background-color: rgba(15, 228, 228, 0.524);
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+}
+
+#main {
+  padding-top: 100px;
+  width: 100%;
+  height: 500px;
+  border-color: #3d5a76;
+}
+
+.sliderh1 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 60px;
+}
+.sliderh11 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 60px;
+  color: #333;
+}
+.sliderp1 {
+  margin-top: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+}
+.sliderbutton1 {
+  margin-top: 20px;
+  width: 200px;
+  height: 40px;
+  background-color: white;
+  color: red;
+  border-radius: 20px;
+  font-size: 18px;
+}
+.sliderbutton2 {
+  margin-top: 20px;
+  width: 200px;
+  height: 40px;
+  background-color: red;
+  color: white;
+  border-radius: 20px;
+  font-size: 18px;
+  border: none;
+}
+
+.div211 {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 3s ease-out forwards;
+}
+.slaq {
+  display: flex;
+  font-size: 18px;
+}
+.fa-arrow-right {
+  color: red;
+}
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#gic {
+  margin-top: 60px;
+  width: 89%;
+  margin-left: 7%;
+  height: 20px;
+  display: flex;
+}
+.gic {
+  width: 91%;
+  height: 1px;
+  background-color: gray;
+  margin-top: 15px;
+}
+#gcayinteqst {
+  color: gray;
+  margin-left: 10px;
+}
+
+footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+  height: 600px;
+  background-color: #083f58;
+  color: white;
+}
+.logos {
+  display: flex;
+  margin-top: 30px;
+  margin-left: 5%;
+  font-size: 20px;
+}
+.imglogo2 {
+  margin-left: 5%;
+  width: 200px;
+  height: 60px;
+  color: #2c3843;
+  background-image: url("https://www.telecomarmenia.am/img/logo-light.svg?v=1");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.footerh {
+  margin-top: 20px;
+  font-size: 20px;
+}
+.footerp {
+  color: rgb(178, 173, 173);
+  margin-top: 10px;
+  text-decoration: none;
+}
+.footernkar {
+  width: 60px;
+  height: 60px;
+}
+.fot {
+  margin-top: 60px;
+  margin-left: 100px;
+}
+.mas5inkarner4 {
+  margin-left: 20px;
+  margin-top: 60px;
+  display: flex;
+  color: white;
+}
+.mas5inkarner2 {
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+}
+#mas5img {
+  width: 100px;
+  height: 100px;
+}
+#l {
+  margin-top: 5px;
+}
+.imagemas5 {
+  width: 200px;
+  height: 40px;
+}
+#footer {
+  color: white;
+  width: 100%;
+  height: 40px;
+  background-color: #0c2a38;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+a.footerp {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.imglogooo{
+  display: none;
+    width: 100px;
+  height: 40px;
+  margin-top: 10px;
+  color: #2c3843;
+  background-image: url("https://www.telecomarmenia.am/img/logo-light.svg?v=1");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+.ll{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+@media (max-width:1250px){
+  .hnone{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 200px;
+    height: auto;
+    color: white;
+    align-items: center;
+  }
+  .h11{
+    width: 150px;
+  }
+  .mas2h22{
+    display: flex;
+  }
+  #mas2h{
+    display: none;
+  }
+  .mas2i2{
+    width: 100px;
+  }
+}
+@media (max-width:1100px){
+  #h2{
+    display: none;
+  }
+  header {
+    height: 40px;
+    grid-template-rows:40px;
+  }
+}
+
+@media (max-width:900px){
+  .hnone{
+    overflow: hidden;
+  }
+  header{
+    width: 100vw;
+  }
+  .h11{
+    display: none;
+  }
+  .imglogooo{
+    display: flex;
+    width: 60px;
+  }
+}
+@media (max-width:1100px){
+  footer{
+    height: 700px;
+  }
+  .fot{
+    margin-left: 50px;
+  }
+}
+@media (max-width:1000px){
+  .footerh {
+    margin-top: 20px;
+    font-size: 18px;
+  }
+  .footerp {
+    font-size: 12pxs;
+  }
+}
+@media (max-width:900px){
+  footer{
+    height: 850px;
+  }
+  .ll{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+@media (max-width:877px){
+  footer{
+    height: 940px;
+  }
+}
+@media (max-width:801px){
+  footer{
+    margin-top: 30px;
+    height: 500px;
+    justify-content: center;
+  }
+  .ll{
+    display: none;
+  }
+}
