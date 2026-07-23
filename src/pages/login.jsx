@@ -81,9 +81,6 @@ function Login() {
                             onChange={(e) => setUsername(e.target.value)}
                           />
                         </div>
-                        {/* <p className="mt-1.5 text-xs text-red-500">
-                          Phone number must be exactly 8 digits and cannot start with 0
-                        </p> */}
                       </div>
                     ) : (
                       <div>
@@ -137,6 +134,65 @@ function Login() {
 
             {mainTab === 'Business' && (
               <div className="text-smtext-center py-8">
+              <h1 className='text=60px mt-[-20px]'>Welcome to Team business account</h1>
+              <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      Select type
+                    </label>
+                    <div className="relative">
+                      <select name="" className='w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]'>
+                        <option value="">Admin</option>
+                        <option value="">Phartner</option>
+                      </select>
+                    </div>
+                  </div>
+              <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      Username
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Enter your username"
+                        className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      
+                    </div>
+                  </div>
+              <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="password"
+                        placeholder="Enter your password"
+                        className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-[#e34234] hover:bg-[#d23528] text-white font-medium text-sm rounded-md transition-colors mt-[10px]"
+                  >
+                    Sign in
+                  </button>
+
+                  <div className="text-center pt-2">
+                    <a href="#forgot" className="text-xs text-gray-600 hover:underline">
+                      Forgot password?
+                    </a>
+                  </div>
               </div>
             )}
           </div>
