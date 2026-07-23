@@ -52,7 +52,7 @@ export function header() {
           </div>
           <div className="h-full text-sm text-center flex items-center justify-center bg-[#083f58] transition duration-1000 border-r border-gray-500 hover:text-red-500 w-[200px] text-white">
             <i className="fa-solid fa-circle-user"></i>
-            <p>Personal account</p>
+            <Link to="/login" >Personal account</Link>
           </div>
         </div>
 

@@ -2,7 +2,7 @@ import { useState,useEffect } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { collection, getDocs, addDoc} from 'firebase/firestore';
-import '../CSS/shared.css'
+import "../CSS/shared.css"
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -66,7 +66,7 @@ function Main() {
     inf1="Mobile"
     className='mt-40 mb-10'
     bgImage="https://www.telecomarmenia.am/images/promo/1/16509682370213.png"
-    sizeClass="w-[47%] h-[300px] max-[1100px]:w-[10%] max-[1100px]:h-[200px]"
+    sizeClass="w-[47%] h-[300px] max-[1100px]:w-[47%] max-[1100px]:h-[200px]"
   />
   <Border1
     inf1="Fixed"
@@ -85,7 +85,7 @@ function Main() {
     inf1="Internet and TV"
     className='mb-10'
     bgImage="https://www.telecomarmenia.am/images/promo/1/16510462295535.png"
-    sizeClass="w-[38%] h-[300px] max-[1100px]:w-[47%] max-[1100px]:h-[250px]"
+    sizeClass="w-[38%] h-[300px] max-[1100px]:w-[47%] max-[1100px]:h-[200px]"
   />
 </div>
 

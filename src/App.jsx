@@ -11,6 +11,7 @@ import Connections from "./pages/conmus";
 import News from "./pages/news"
 import Carrer from "./pages/carrer";
 import Hphone from "./pages/home-phone";
+import Login from "./pages/login";
 function App() {
   return (
     <BrowserRouter>
@@ -27,6 +28,7 @@ function App() {
           <Route path="/news" element={<News/>} />
           <Route path="/carrer" element={<Carrer/>} />
           <Route path="/home-phone" element={<Hphone/>} />
+          <Route path="/login" element={<Login/>} />
         </Routes>
       </div>
     </BrowserRouter>
