@@ -1,6 +1,15 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export function header() {
+  // 🔹 Ստուգում ենք localStorage-ից՝ user-ը logged in է թե ոչ
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+    setIsLoggedIn(loggedIn);
+  }, []);
+
   return (
     <header className="w-full h-[100px] grid grid-rows-[40px_60px] border-b border-gray-500 fixed top-0 left-0 z-[1000] max-[1100px]:h-10 max-[1100px]:grid-rows-[40px] max-[900px]:w-screen">
       
@@ -50,10 +59,20 @@ export function header() {
           <div className="w-[100px] h-full text-white text-sm text-center flex items-center justify-center bg-[#083f58] transition duration-1000 border-r border-gray-500 hover:text-red-500">
             <p>Eng</p>
           </div>
-          <div className="h-full text-sm text-center flex items-center justify-center bg-[#083f58] transition duration-1000 border-r border-gray-500 hover:text-red-500 w-[200px] text-white">
-            <i className="fa-solid fa-circle-user"></i>
-            <Link to="/login" >Personal account</Link>
-          </div>
+
+          {isLoggedIn ? (
+            <Link
+              to="/page1"
+              className="h-full text-sm text-center flex items-center justify-center bg-[#083f58] transition duration-1000 border-r border-gray-500 hover:text-red-500 w-[200px] text-white no-underline"
+            >
+              <i className="fa-solid fa-circle-user text-2xl"></i>
+            </Link>
+          ) : (
+            <div className="h-full text-sm text-center flex items-center justify-center bg-[#083f58] transition duration-1000 border-r border-gray-500 hover:text-red-500 w-[200px] text-white">
+              <i className="fa-solid fa-circle-user"></i>
+              <Link to="/login">Personal account</Link>
+            </div>
+          )}
         </div>
 
         <div className="hidden max-[1250px]:flex">
@@ -66,7 +85,6 @@ export function header() {
         </div>
       </div>
 
-      {/* h2 - ստորին տող */}
       <div className="bg-white flex justify-around max-[1100px]:hidden">
         <div className="flex">
           <div className="w-[100px] h-10 mt-2.5 bg-[url('https://www.telecomarmenia.am/img/logo-light.svg?v=1')] bg-contain bg-no-repeat" />

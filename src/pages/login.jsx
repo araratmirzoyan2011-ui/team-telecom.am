@@ -1,12 +1,38 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { db } from "../firebase.js";
 import { os } from '../Components/os.jsx';
 import { os2 } from '../Components/os2.jsx';
+
 function Login() {
   const [mainTab, setMainTab] = useState('Private Clients');
   const [loginMethod, setLoginMethod] = useState('phone');
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+  e.preventDefault();
+
+  try {
+    await addDoc(collection(db, "accounts"), {
+      username: username,
+      loginMethod: loginMethod,
+      accountType: mainTab,
+      timestamp: serverTimestamp(),
+    });
+    localStorage.setItem("isLoggedIn", "true"); 
+    localStorage.setItem("username", username);
+
+    navigate("/page1");
+
+  } catch (error) {
+    console.error("Login-ի սխալ. ", error);
+  }
+};
 
   return (
     <>
@@ -24,10 +50,8 @@ function Login() {
 
           <div className="w-full ml-[10%] mt-[60px] max-w-md mx-auto bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex border-b border-gray-200 mb-6 relative">
-
                 {os("Private Clients", mainTab, setMainTab)}
                 {os("Business", mainTab, setMainTab)}
-
             </div> 
 
             {mainTab === 'Private Clients' && (
@@ -37,7 +61,7 @@ function Login() {
                     {os2("email", "E-mail", loginMethod, setLoginMethod)}
                 </div>
 
-                <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div>
                     <label className="block text-xs font-medium text-gray-500 mb-1">
                       Username
@@ -53,11 +77,13 @@ function Login() {
                             type="tel"
                             placeholder="Enter your username"
                             className="w-full px-3 py-2.5 text-sm focus:outline-none bg-transparent"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                           />
                         </div>
-                        <p className="mt-1.5 text-xs text-red-500">
+                        {/* <p className="mt-1.5 text-xs text-red-500">
                           Phone number must be exactly 8 digits and cannot start with 0
-                        </p>
+                        </p> */}
                       </div>
                     ) : (
                       <div>
@@ -65,6 +91,8 @@ function Login() {
                           type="email"
                           placeholder="Enter your email"
                           className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
                         />
                       </div>
                     )}
@@ -79,6 +107,8 @@ function Login() {
                         type="password"
                         placeholder="Enter your password"
                         className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                       />
                       <button
                         type="button"
@@ -107,72 +137,14 @@ function Login() {
 
             {mainTab === 'Business' && (
               <div className="text-smtext-center py-8">
-                <h3 className="block text-xs font-medium text-black-500 mb-[20px] text-[24px]">Welcome to Team business account</h3>
-                <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <select
-                        placeholder="Enter your password"
-                        className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
-                      >
-                        <option value="">Admin</option>
-                        <option value="">Parthner</option>
-                      </select>
-                  </div>
-                  </div>
-                <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Username
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Enter your username"
-                        className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="password"
-                        placeholder="Enter your password"
-                        className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        👁
-                      </button>
-                    </div>
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-[#e34234] hover:bg-[#d23528] text-white font-medium text-sm rounded-md transition-colors mt-[40px]"
-                  >
-                    Sign in
-                  </button>
-
-                  <div className="text-center pt-2">
-                    <a href="#forgot" className="text-xs text-gray-600 hover:underline">
-                      Forgot password?
-                    </a>
-                  </div>
               </div>
-              
             )}
           </div>
         </div>
 
         <div className="bg-[url(https://static.tildacdn.com/tild3066-6435-4130-a662-656537366333/IMG_0167b.jpg)] bg-no-repeat bg-[length:100%_100%] flex flex-col justify-center items-center">
-        <h1 className='text-[60px] text-[#2c3843]'>PERSONAL ACCOUT</h1>
-        <img src="https://www.telecomarmenia.am/myaccount/img/mobile-devices.png?v=3" className='w-[350px] h-[400px]' alt="" />
+          <h1 className='text-[60px] text-[#2c3843]'>PERSONAL ACCOUT</h1>
+          <img src="https://www.telecomarmenia.am/myaccount/img/mobile-devices.png?v=3" className='w-[350px] h-[400px]' alt="" />
         </div>
       </div>
     </>
