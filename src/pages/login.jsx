@@ -39,7 +39,7 @@ function Login() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, username, password);
       console.log("Մուտք գործեց:", userCredential.user);
-      navigate("/user");
+      navigate("/page1");
     } catch (error) {
       if (
         error.code === 'auth/invalid-credential' ||
