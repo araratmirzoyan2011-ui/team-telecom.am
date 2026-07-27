@@ -21,6 +21,7 @@ export function header() {
   return (
     <header className="w-full h-[100px] grid grid-rows-[40px_60px] border-b border-gray-500 fixed top-0 left-0 z-[1000] max-[1100px]:h-10 max-[1100px]:grid-rows-[40px] max-[900px]:w-screen">
       
+      {/* h1 - վերին տող */}
       <div className="bg-[#083f58] flex justify-around">
         
         <div className="grid grid-cols-3">
@@ -69,7 +70,7 @@ export function header() {
 
           {isLoggedIn ? (
             <Link
-              to="/page1"
+              to="/user"
               className="h-full text-sm text-center flex items-center justify-center bg-[#083f58] transition duration-1000 border-r border-gray-500 hover:text-red-500 w-[200px] text-white no-underline"
             >
               <i className="fa-solid fa-circle-user text-2xl"></i>

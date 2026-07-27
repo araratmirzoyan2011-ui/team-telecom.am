@@ -13,6 +13,7 @@ import Carrer from "./pages/carrer";
 import Register from './Pages/register';
 import Hphone from "./pages/home-phone";
 import Login from "./pages/login";
+import User from "./pages/user";
 function App() {
   return (
     <BrowserRouter>
@@ -31,6 +32,7 @@ function App() {
           <Route path="/home-phone" element={<Hphone/>} />
           <Route path="/login" element={<Login/>} />
           <Route path="/register" element={<Register />} />
+          <Route path="/user" element={<User />} />
         </Routes>
       </div>
     </BrowserRouter>
