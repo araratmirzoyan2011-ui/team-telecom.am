@@ -3,37 +3,58 @@ import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore
 import { Link, useNavigate } from 'react-router-dom';
 import { db } from "../firebase.js";
 import { os } from '../Components/os.jsx';
-import { os2 } from '../Components/os2.jsx';
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase.js";
+import { signOut } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 function Login() {
   const [mainTab, setMainTab] = useState('Private Clients');
-  const [loginMethod, setLoginMethod] = useState('phone');
-
+  const [errorMsg, setErrorMsg] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [accountType, setAccountType] = useState('Admin');
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    localStorage.clear();
+  }, []);
+
   const handleLogin = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    setErrorMsg('');
 
-  try {
-    await addDoc(collection(db, "accounts"), {
-      username: username,
-      loginMethod: loginMethod,
-      password: password,
-      accountType: mainTab,
-      timestamp: serverTimestamp(),
-    });
-    localStorage.setItem("isLoggedIn", "true"); 
-    localStorage.setItem("username", username);
+    setIsLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, username, password);
+      console.log("Մուտք գործեց:", userCredential.user);
+      navigate("/page1");
+    } catch (error) {
+      if (
+        error.code === 'auth/invalid-credential' ||
+        error.code === 'auth/wrong-password' ||
+        error.code === 'auth/user-not-found'
+      ) {
+        setErrorMsg('Սխալ մուտքանուն կամ գաղտնաբառ');
+      } else {
+        setErrorMsg('Ինչ-որ բան սխալ գնաց, փորձիր կրկին');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    navigate("/page1");
-
-  } catch (error) {
-    console.error("Login-ի սխալ. ", error);
-  }
-};
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout-ի սխալ:", error.message);
+    }
+  };
 
   return (
     <>
@@ -56,149 +77,145 @@ function Login() {
             </div> 
 
             {mainTab === 'Private Clients' && (
-              <>
-                 <div className="flex border-b border-gray-200 mb-6 relative">
-                    {os2("phone", "Phone number", loginMethod, setLoginMethod)}
-                    {os2("email", "E-mail", loginMethod, setLoginMethod)}
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    Username
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Username
-                    </label>
-
-                    {loginMethod === 'phone' ? (
-                      <div>
-                        <div className="flex items-center border border-gray-300 rounded-md focus-within:ring-1 focus-within:ring-[#00a896] focus-within:border-[#00a896]">
-                          <span className="pl-3 pr-2 text-gray-500 text-sm select-none border-r border-gray-300 py-2.5">
-                            +374
-                          </span>
-                          <input
-                            type="tel"
-                            placeholder="Enter your username"
-                            className="w-full px-3 py-2.5 text-sm focus:outline-none bg-transparent"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div>
-                        <input
-                          type="email"
-                          placeholder="Enter your email"
-                          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                        />
-                      </div>
-                    )}
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? "🙈" : "👁"}
+                    </button>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Password
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="password"
-                        placeholder="Enter your password"
-                        className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      >
-                        👁
-                      </button>
-                    </div>
-                  </div>
+                {errorMsg && (
+                  <p className="text-red-500 text-xs text-center">{errorMsg}</p>
+                )}
 
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-[#e34234] hover:bg-[#d23528] text-white font-medium text-sm rounded-md transition-colors"
-                  >
-                    Sign in
-                  </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3 bg-[#e34234] hover:bg-[#d23528] disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium text-sm rounded-md transition-colors"
+                >
+                  {isLoading ? "Please wait..." : "Sign in"}
+                </button>
 
-                  <div className="text-center pt-2">
-                    <a href="#forgot" className="text-xs text-gray-600 hover:underline">
-                      Forgot password?
-                    </a>
-                  </div>
-                </form>
-              </>
+                <div className="text-center pt-2">
+                  <span className="text-xs text-gray-600">Don't have an account in Team? </span>
+                  <Link to="/register" className="text-xs text-[#e34234] hover:underline">
+                    Register
+                  </Link>
+                </div>
+
+                <div className="text-center pt-2">
+                  <a href="#forgot" className="text-xs text-gray-600 hover:underline">
+                    Forgot password?
+                  </a>
+                </div>
+              </form>
             )}
 
             {mainTab === 'Business' && (
-  <form onSubmit={handleLogin} className="text-sm text-center py-8">
-    <h1 className='text-[22px] mt-[-20px]'>Welcome to Team business account</h1>
+              <form onSubmit={handleLogin} className="text-sm text-center py-8">
+                <h1 className='text-[22px] mt-[-20px]'>Welcome to Team business account</h1>
 
-    <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">
-        Select type
-      </label>
-      <div className="relative">
-        <select name="" className='w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]'>
-          <option value="Admin">Admin</option>
-          <option value="Partner">Partner</option>
-        </select>
-      </div>
-    </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    Select type
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={accountType}
+                      onChange={(e) => setAccountType(e.target.value)}
+                      className='w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]'
+                    >
+                      <option value="Admin">Admin</option>
+                      <option value="Partner">Partner</option>
+                    </select>
+                  </div>
+                </div>
 
-    <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">
-        Username
-      </label>
-      <div className="relative">
-        <input
-          type="text"
-          placeholder="Enter your username"
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-    </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    Username
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Enter your username"
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-    <div>
-      <label className="block text-xs font-medium text-gray-500 mb-1">
-        Password
-      </label>
-      <div className="relative">
-        <input
-          type="password"
-          placeholder="Enter your password"
-          className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button
-          type="button"
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-        >
-          👁
-        </button>
-      </div>
-    </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? "🙈" : "👁"}
+                    </button>
+                  </div>
+                </div>
 
-    <button
-      type="submit"
-      className="w-full py-3 bg-[#e34234] hover:bg-[#d23528] text-white font-medium text-sm rounded-md transition-colors mt-[10px]"
-    >
-      Sign in
-    </button>
+                {errorMsg && (
+                  <p className="text-red-500 text-xs text-center">{errorMsg}</p>
+                )}
 
-    <div className="text-center pt-2">
-      <a href="#forgot" className="text-xs text-gray-600 hover:underline">
-        Forgot password?
-      </a>
-    </div>
-  </form>
-)}
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3 bg-[#e34234] hover:bg-[#d23528] disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium text-sm rounded-md transition-colors mt-[10px]"
+                >
+                  {isLoading ? "Please wait..." : "Sign in"}
+                </button>
+
+                <div className="text-center pt-2">
+                  <a href="#forgot" className="text-xs text-gray-600 hover:underline">
+                    Forgot password?
+                  </a>
+                </div>
+              </form>
+            )}
           </div>
         </div>
 

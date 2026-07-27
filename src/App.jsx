@@ -10,6 +10,7 @@ import Paymanner from "./pages/paymanner";
 import Connections from "./pages/conmus";
 import News from "./pages/news"
 import Carrer from "./pages/carrer";
+import Register from './Pages/register';
 import Hphone from "./pages/home-phone";
 import Login from "./pages/login";
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/carrer" element={<Carrer/>} />
           <Route path="/home-phone" element={<Hphone/>} />
           <Route path="/login" element={<Login/>} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </div>
     </BrowserRouter>

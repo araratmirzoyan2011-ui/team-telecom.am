@@ -1,19 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase.js";
 
 export function header() {
-  // 🔹 Ստուգում ենք localStorage-ից՝ user-ը logged in է թե ոչ
+  // 🔹 Firebase Authentication-ի իրական state-ով ստուգում ենք՝ user-ը logged in է թե ոչ
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedIn);
+    // onAuthStateChanged-ը ինքնաշխատ լսում է login/logout փոփոխությունները
+    // և թարմացնում isLoggedIn-ը իրական ժամանակում, առանց localStorage-ի կարիքի
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(!!user);
+    });
+
+    // Component unmount-ի ժամանակ լսողը մաքրում ենք, որ memory leak չլինի
+    return () => unsubscribe();
   }, []);
 
   return (
     <header className="w-full h-[100px] grid grid-rows-[40px_60px] border-b border-gray-500 fixed top-0 left-0 z-[1000] max-[1100px]:h-10 max-[1100px]:grid-rows-[40px] max-[900px]:w-screen">
       
-      {/* h1 - վերին տող */}
       <div className="bg-[#083f58] flex justify-around">
         
         <div className="grid grid-cols-3">
