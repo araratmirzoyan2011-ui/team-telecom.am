@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } f
 import { auth } from "../firebase.js";
 
 function Login() {
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [authMode, setAuthMode] = useState('login');
   const [errorMsg, setErrorMsg] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +20,6 @@ function Login() {
     localStorage.clear();
   }, []);
 
-  // Փոխում ենք Login ⇄ Register և մաքրում ենք ֆորմը
   const switchMode = (mode) => {
     setAuthMode(mode);
     setErrorMsg('');
@@ -68,14 +67,9 @@ function Login() {
 
     setIsLoading(true);
     try {
-      // Ստեղծում ենք account-ը Firebase Authentication-ում
       const userCredential = await createUserWithEmailAndPassword(auth, username, password);
       console.log("Գրանցվեց:", userCredential.user);
-
-      // Firebase-ը ինքնաշխատ login է անում account ստեղծելուց հետո,
-      // ուստի անմիջապես sign out ենք անում, որ user-ը ինքը մուտքագրի իր տվյալները
       await signOut(auth);
-
       switchMode('login');
       setErrorMsg('');
     } catch (error) {
@@ -93,18 +87,10 @@ function Login() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout-ի սխալ:", error.message);
-    }
-  };
 
   return (
     <>
-      <div className="grid grid-cols-[30%_60%] w-full h-[100%] gap-[10%]" >
+      <div className="grid grid-cols-[30%_65%] w-full h-[100vh] gap-[5%]" >
         <div className="">
           <div
             style={{

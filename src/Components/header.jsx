@@ -4,17 +4,13 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase.js";
 
 export function header() {
-  // 🔹 Firebase Authentication-ի իրական state-ով ստուգում ենք՝ user-ը logged in է թե ոչ
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // onAuthStateChanged-ը ինքնաշխատ լսում է login/logout փոփոխությունները
-    // և թարմացնում isLoggedIn-ը իրական ժամանակում, առանց localStorage-ի կարիքի
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(!!user);
     });
 
-    // Component unmount-ի ժամանակ լսողը մաքրում ենք, որ memory leak չլինի
     return () => unsubscribe();
   }, []);
 
