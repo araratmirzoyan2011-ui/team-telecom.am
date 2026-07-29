@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { db } from "../firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
@@ -10,6 +10,8 @@ function Login() {
   const [errorMsg, setErrorMsg] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [about, setAbout] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +28,8 @@ function Login() {
     setUsername('');
     setPassword('');
     setConfirmPassword('');
+    setName('');
+    setAbout('');
   };
 
   const handleLogin = async (e) => {
@@ -67,8 +71,20 @@ function Login() {
 
     setIsLoading(true);
     try {
+      // 1. Ստեղծում ենք user-ը Firebase Authentication-ում
       const userCredential = await createUserWithEmailAndPassword(auth, username, password);
-      console.log("Գրանցվեց:", userCredential.user);
+      const user = userCredential.user;
+
+      // 2. Պահում ենք registration-ի տվյալները առանձին "info" collection-ում
+      await addDoc(collection(db, "info"), {
+        uid: user.uid,
+        email: username,
+        name: name,
+        about: about,
+        createdAt: serverTimestamp(),
+      });
+
+      console.log("Գրանցվեց:", user);
       await signOut(auth);
       switchMode('login');
       setErrorMsg('');
@@ -185,7 +201,30 @@ function Login() {
                     onChange={(e) => setUsername(e.target.value)}
                   />
                 </div>
-
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    Nickname
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter your nickname"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    About you
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Tell us about yourself"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#00a896] focus:border-[#00a896]"
+                    value={about}
+                    onChange={(e) => setAbout(e.target.value)}
+                  />
+                </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 mb-1">
                     Password
