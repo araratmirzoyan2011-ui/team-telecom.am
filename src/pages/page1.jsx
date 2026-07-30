@@ -80,6 +80,7 @@ function Main() {
         className='mb-10'
     bgImage="https://www.telecomarmenia.am/images/promo/1/16509690498367.png"
     sizeClass="w-[56%] h-[300px] max-[1100px]:w-[47%] max-[1100px]:h-[200px]"
+    onClickHandler={() => navigate('/Applications')}
   />
   <Border1
     inf1="Internet and TV"
