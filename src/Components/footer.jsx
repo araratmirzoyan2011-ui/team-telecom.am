@@ -86,7 +86,7 @@ export function footer() {
               className="w-[60px] h-[60px]"
             />
             <h1 className="mt-5 text-xl max-[1000px]:mt-5 max-[1000px]:text-lg">Team applications</h1>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">TeamTV</p>
+            <Link to="/TeamTv" className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">TeamTV</Link>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">My Team</p>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">TeamPay</p>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Team Energy</p>

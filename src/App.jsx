@@ -14,6 +14,7 @@ import Hphone from "./pages/home-phone";
 import Login from "./pages/login";
 import User from "./pages/user";
 import Applicate from "./pages/Applications";
+import TeamTv from "./pages/TeamTv";
 function App() {
   return (
     <BrowserRouter>
@@ -33,6 +34,7 @@ function App() {
           <Route path="/login" element={<Login/>} />
           <Route path="/user" element={<User />} />
           <Route path="/Applications" element={<Applicate />} />
+          <Route path="/TeamTv" element={<TeamTv />} />
         </Routes>
       </div>
     </BrowserRouter>
