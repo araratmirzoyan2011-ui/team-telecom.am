@@ -15,6 +15,9 @@ import Login from "./pages/login";
 import User from "./pages/user";
 import Applicate from "./pages/Applications";
 import TeamTv from "./pages/TeamTv";
+import MyTeam from "./pages/MyTeam";
+import TeamPay from "./pages/TeamPay";
+import TeamEnergy from "./pages/TeamEnergy";
 function App() {
   return (
     <BrowserRouter>
@@ -35,6 +38,9 @@ function App() {
           <Route path="/user" element={<User />} />
           <Route path="/Applications" element={<Applicate />} />
           <Route path="/TeamTv" element={<TeamTv />} />
+          <Route path="/MyTeam" element={<MyTeam />} />
+          <Route path="/TeamPay" element={<TeamPay />} />
+          <Route path="/TeamEnergy" element={<TeamEnergy />} />
         </Routes>
       </div>
     </BrowserRouter>

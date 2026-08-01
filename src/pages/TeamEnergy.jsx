@@ -7,10 +7,10 @@ import { Astx } from '../Components/astx.jsx';
 import { Nkar } from '../Components/ng.jsx';
 import { Border } from '../Components/Appborder.jsx';
 import { footer } from '../Components/footer.jsx';
-function TeamTv() {
+function TeamEnergy() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("ios");
-    const inf = { title: "TeamTV", img1: "https://www.telecomarmenia.am/images/team_apps/1/17249416402556.png", img2: "https://www.telecomarmenia.am/images/team_apps/1/17485849137763.jpeg", img3: "https://www.telecomarmenia.am/images/team_apps/1/17485849138256.jpeg", img4: "https://www.telecomarmenia.am/images/team_apps/1/17485849138582.jpeg" };
+    const inf = { title: "Team Energy", img1: "https://www.telecomarmenia.am/images/team_apps/1/17116228874075.png", img2: "https://www.telecomarmenia.am/images/team_apps/1/17116228874283.jpeg", img3: "https://www.telecomarmenia.am/images/team_apps/1/17116228874409.jpeg", img4: "https://www.telecomarmenia.am/images/team_apps/1/1711622887455.jpeg" };
     const inf2 = { title: "My Team", img1: "https://www.telecomarmenia.am/images/team_apps/1/16510708696227.png", onclick: "/my-team" };
     const inf3 = { title: "TeamPay", img1: "https://www.telecomarmenia.am/images/team_apps/1/17691688001842.png", onclick: "/TeamPay" };
 
@@ -22,8 +22,8 @@ function TeamTv() {
                 <div className='w-full h-[300px] grid grid-cols-[40%_60%] mt-[60px]'>
                     <img src={inf.img1} alt="" className='rounded-[10px]'/>
                     <div className='flex flex-col ml-[60px]'>
-                        <Astx img="https://www.telecomarmenia.am/img/redesign/app_store.png" rate={3.5} />
-                        <Astx img="https://www.telecomarmenia.am/img/redesign/google_play.png" rate={3.6} />
+                        <Astx img="https://www.telecomarmenia.am/img/redesign/app_store.png" rate={3.8} />
+                        <Astx img="https://www.telecomarmenia.am/img/redesign/google_play.png" rate={3.5} />
                     </div>
                 </div>
             </div>
@@ -60,24 +60,20 @@ function TeamTv() {
                         </div>
                     ) : (
                         <div className='flex h-[90%]'>
+                            {Nkar(inf.img4)}
                             {Nkar(inf.img2)}
                             {Nkar(inf.img3)}
-                            {Nkar(inf.img4)}
                         </div>
                     )}
                 </div>
             </div>
             <div className='ml-[15%] w-[30%] h-[600px] mt-[100px] text-gray-500'>
-                <p className='font-medium'>Modern TV is always near</p>
+                <p className='font-medium'>Team Energy հավելվածի միջոցով կարող եք գտնել մոտակա էլեկտրական լիցքավորման կայանը, հետևելով քայլերի հաջորդականությանը՝ հեշտությամբ լիցքավորել մեքենան և կատարել էլեկտրոնային վճարում նախընտրած տարբերակով։</p>
                 <ul className='list-disc list-inside mt-[20px]'>
-                    <li className='mt-[10px]'>Modern TV always with you</li>
-                    <li className='mt-[10px]'>Up to 200 channels</li>
-                    <li className='mt-[10px]'>More than 5000 movies in VOD</li>
-                    <li className='mt-[10px]'>Watch on 5 devices</li>
-                    <li className='mt-[10px]'>Up to 7 days catch-up</li>
-                    <li className='mt-[10px]'>Buy additional channels and packages</li>
-                    <li className='mt-[10px]'>YouTube on TV</li>
-                    <li className='mt-[10px]'>EPG -Electronic Program Guide</li>
+                    <li className='mt-[10px]'>Բոլոր տեսակի էլեկտրոմոբիլների լիցքավորում</li>
+                    <li className='mt-[10px]'>Օգտագործման մեջ մատչելի</li>
+                    <li className='mt-[10px]'>Կայաններ ՀՀ ամբողջ տարածքում</li>
+                    <li className='mt-[10px]'>Նոր բարելավված AC և արագ լիցքավորող DC կայաններ</li>
                 </ul>
             </div>
             <div className='ml-[15%] w-[30%] h-[600px] mt-[-150px] text-[48px] text-black-500'>
@@ -92,4 +88,4 @@ function TeamTv() {
     );
 }
 
-export default TeamTv;
+export default TeamEnergy;
