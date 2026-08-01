@@ -12,7 +12,8 @@ import Border1 from '../Components/border1.jsx';
 import { slider1 } from '../Components/slider1.jsx';
 import { header } from '../Components/header.jsx';
 import { sli2 } from '../Components/slider2.jsx';
-import { footer } from '../Components/footer.jsx';
+// import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 import { f1 } from '../Components/p1m5.jsx';
 import { gic } from '../Components/gic.jsx';
 import Bb1 from '../Components/bb1.jsx';
@@ -131,7 +132,7 @@ function Main() {
       {gic()}
 
       {f1()}
-    {footer()}
+    <Footer />
      
     </>
   )

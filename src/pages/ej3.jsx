@@ -8,7 +8,7 @@ import 'swiper/css/pagination';
 import { db } from "../firebase.js";
 import { Link } from 'react-router-dom';
 import { header } from '../Components/header.jsx';
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 import { slider4 } from '../Components/slider4.jsx';
 import { border4 } from '../Components/border4.jsx';
 import { slider5 } from '../Components/slider5.jsx';
@@ -119,7 +119,7 @@ function Shop() {
             )}
         </div>
 
-        {footer()}
+        <Footer />
         </>
     )
 }

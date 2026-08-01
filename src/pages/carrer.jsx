@@ -1,6 +1,6 @@
 
 import { header } from '../Components/header.jsx';
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 import { border } from '../Components/news-border.jsx';
 import { border2 } from '../Components/news-border2.jsx';
 import { kalendar } from '../Components/kalendar.jsx';
@@ -36,7 +36,7 @@ function Carrer(){
         <div className="w-[200px] h-[60px] ml-[10%] flex flex-row items-center justify-around text-[rgb(44,43,43)] mb-[60px]">
             {share()}
         </div>
-        {footer()}
+         <Footer />
         </>
     )
 }

@@ -1,6 +1,6 @@
 
 import { header } from '../Components/header.jsx';
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 import { kalendar } from '../Components/kalendar.jsx';
 import { share } from '../Components/Share.jsx';
 import { bgimg } from "../Components/bg.jsx";
@@ -30,7 +30,7 @@ function Hphone() {
             {hborder3("Alternative 2","Fixed phone for home")}
             {hborder3("Card Phones","Phone cards for payphones")}
         </div>
-        {footer()}
+        <Footer />
         </>
     )
 }

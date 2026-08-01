@@ -6,12 +6,12 @@ import { header } from '../Components/header.jsx';
 import { Astx } from '../Components/astx.jsx';
 import { Nkar } from '../Components/ng.jsx';
 import { Border } from '../Components/Appborder.jsx';
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 function TeamEnergy() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("ios");
     const inf = { title: "Team Energy", img1: "https://www.telecomarmenia.am/images/team_apps/1/17116228874075.png", img2: "https://www.telecomarmenia.am/images/team_apps/1/17116228874283.jpeg", img3: "https://www.telecomarmenia.am/images/team_apps/1/17116228874409.jpeg", img4: "https://www.telecomarmenia.am/images/team_apps/1/1711622887455.jpeg" };
-    const inf2 = { title: "My Team", img1: "https://www.telecomarmenia.am/images/team_apps/1/16510708696227.png", onclick: "/my-team" };
+    const inf2 = { title: "My Team", img1: "https://www.telecomarmenia.am/images/team_apps/1/16510708696227.png", onclick: "/MyTeam" };
     const inf3 = { title: "TeamPay", img1: "https://www.telecomarmenia.am/images/team_apps/1/17691688001842.png", onclick: "/TeamPay" };
 
     return (
@@ -83,7 +83,7 @@ function TeamEnergy() {
     {Border(inf2.img1, inf2.title, "My Team հավելվածի միջոցով Դուք կարող եք՝ Հաշվեկշռի և փաթեթների մնացորդների ստուգում Ավտոմատ վճարումների ակտիվացում Սակագնային փաթեթների փոփոխում Ծառայությունների ակտիվացում Էքսկլյուզիվ առաջարկներ Առցանց օգնություն Shake", () => navigate(inf2.onclick))}
     {Border(inf3.img1, inf3.title, "Էլեկտրոնային դրամապանակ ավելի քան 50 տեսակի վճարումների համար Հատուկ առաջարկեր և ակցիաներ", () => navigate(inf3.onclick))}
 </div>
-{footer()}
+<Footer />
         </>
     );
 }

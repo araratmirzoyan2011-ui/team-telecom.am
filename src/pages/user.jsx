@@ -5,7 +5,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from "../firebase.js";
 import { auth } from "../firebase.js";
 import { header } from "../Components/header"
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 
 const DEFAULT_AVATAR = "https://i.pinimg.com/originals/65/1c/6d/651c6da502353948bdc929f02da2b8e0.jpg?nii=t";
 
@@ -102,7 +102,7 @@ function User() {
           )}
         </div>
       </div>
-      {footer()}
+      <Footer />
     </>
   )
 }

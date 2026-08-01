@@ -3,7 +3,7 @@ import { collection, getDocs, addDoc} from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from "../firebase.js";
 import { header } from '../Components/header.jsx';
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 import { share } from '../Components/Share.jsx';
 import { text } from '../Components/about-us-text.jsx';
 function About() {
@@ -16,7 +16,7 @@ function About() {
       <div className="w-[200px] h-[60px] ml-[10%] flex flex-row items-center justify-around text-[rgb(44,43,43)] mb-[60px]">
         {share()}
       </div>
-      {footer()}
+     <Footer />
       </>
     )
 }

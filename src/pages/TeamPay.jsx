@@ -6,7 +6,7 @@ import { header } from '../Components/header.jsx';
 import { Astx } from '../Components/astx.jsx';
 import { Nkar } from '../Components/ng.jsx';
 import { Border } from '../Components/Appborder.jsx';
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 import "../CSS/shared.css"
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -134,7 +134,7 @@ function TeamPay() {
             <div className='ml-[15%] w-[70%] mt-[-450px] grid grid-cols-2 gap-[60px] mb-[100px]'>
     {Border(inf2.img1, inf2.title, "Ժամանակակից TV միշտ քեզ հետ Ժամանակակից TV միշտ քեզ հետ Մինչև 200 ալիք Ավելի քան 5000 ֆիլմ տեսադարանում Դիտում 5 սարքավորումներով Մինչև 7 օր catch-upՀավելյալ ալիքների և փաթեթների գնումYouTube հեռուստացույցով EPG - Հաղորդումների էլեկտրոնային ցանկ", () => navigate(inf2.onclick))}
     {Border(inf3.img1, inf3.title, "Team Energy հավելվածի միջոցով կարող եք գտնել մոտակա էլեկտրական լիցքավորման կայանը, հետևելով քայլերի հաջորդականությանը՝ հեշտությամբ լիցքավորել մեքենան և կատարել էլեկտրոնային վճարում նախընտրած տարբերակով։ Բոլոր տեսակի էլեկտրոմոբիլների լիցքավորում Օգտագործման մեջ մատչելի Կայաններ ՀՀ ամբողջ տարածքում Նոր բարելավված AC և արագ լիցքավորող DC կայաններ", () => navigate(inf3.onclick))}</div>
-{footer()}
+<Footer />
         </>
     );
 }

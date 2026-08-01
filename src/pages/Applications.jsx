@@ -1,4 +1,4 @@
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { header } from '../Components/header.jsx';
 import { Border } from '../Components/Appborder.jsx';
@@ -34,7 +34,7 @@ function Applicate() {
                     ))
                 }
             </div>
-            {footer()}
+            <Footer />
         </>
     )
 }

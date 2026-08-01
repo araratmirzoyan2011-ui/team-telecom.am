@@ -1,6 +1,19 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../firebase.js";
 
-export function footer() {
+export default function Footer() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLoggedIn(!!user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <>
       <footer className="flex flex-row justify-around w-full h-[600px] bg-[#083f58] text-white max-[1100px]:h-[700px] max-[900px]:h-[850px] max-[877px]:h-[940px] max-[801px]:mt-[30px] max-[801px]:h-[500px] max-[801px]:justify-center">
@@ -22,6 +35,15 @@ export function footer() {
             <i className="fa-regular fa-envelope"></i>
             <p>info@telecomarmenia.am</p>
           </div>
+          {isLoggedIn ? (
+            <Link to="/chat" className="ml-[5%]">
+              <i class="fa-regular fa-comment"></i>
+            </Link>
+          ) : (
+            <Link to="/" className="ml-[5%]">
+              <i class="fa-regular fa-comment"></i>
+            </Link>
+          )}
           <div className="ml-5 mt-[60px] flex text-white">
             <img
               src="https://www.telecomarmenia.am/img/redesign/qr.svg"

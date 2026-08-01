@@ -11,7 +11,7 @@ import { db } from "../firebase.js";
 // import { border } from '../text.jsx';
 import { border7 } from '../Components/border7.jsx';
 import { header } from '../Components/header.jsx';
-import { footer } from '../Components/footer.jsx';
+import Footer from '../Components/footer.jsx';
 import { sl3 } from '../Components/slider3.jsx';
 import { border2 } from '../Components/border2.jsx';
 import { gic } from '../Components/gic.jsx';
@@ -66,7 +66,7 @@ function Busines(){
 </div>
       {l()}
       {m5()}
-      {footer()}
+      <Footer />
     </>
     
     )   
