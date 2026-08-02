@@ -18,8 +18,6 @@ import TeamTv from "./pages/TeamTv";
 import MyTeam from "./pages/MyTeam";
 import TeamPay from "./pages/TeamPay";
 import TeamEnergy from "./pages/TeamEnergy";
-import Chat from "./pages/chat";
-import AdminPanel from "./components/AdminPanel";
 function App() {
   return (
     <BrowserRouter>
@@ -43,8 +41,7 @@ function App() {
           <Route path="/MyTeam" element={<MyTeam />} />
           <Route path="/TeamPay" element={<TeamPay />} />
           <Route path="/TeamEnergy" element={<TeamEnergy />} />
-          <Route path="/chat" element={<Chat/>} />
-        <Route path="/admin" element={<AdminPanel />} />
+          
         </Routes>
       </div>
     </BrowserRouter>
