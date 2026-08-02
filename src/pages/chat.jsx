@@ -11,12 +11,10 @@ import { db } from "../firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Link } from "react-router-dom";
 
-// Երկու uid-ից եզակի ու կայուն chatId ենք կազմում
 function getChatId(uid1, uid2) {
   return [uid1, uid2].sort().join("_");
 }
 
-// Initials avatar-ի համար
 function getInitials(nameOrEmail) {
   if (!nameOrEmail) return "?";
   const trimmed = nameOrEmail.trim();
@@ -27,7 +25,6 @@ function getInitials(nameOrEmail) {
   return trimmed.slice(0, 2).toUpperCase();
 }
 
-// Uid-ից deterministic գույն, որ նույն user-ը միշտ նույն avatar գույնն ունենա
 const AVATAR_COLORS = [
   "#00a896",
   "#e34234",

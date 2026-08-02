@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
+import { collection, doc, setDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { Link, useNavigate } from 'react-router-dom';
 import { db } from "../firebase.js";
 import {
@@ -69,15 +69,18 @@ function Login() {
       const user = result.user;
       console.log("Google-ով մուտք գործեց:", user);
 
+      // Ստուգում ենք՝ arդեն կա՞ info/{uid} doc-ը
       const q = query(collection(db, "info"), where("uid", "==", user.uid));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        await addDoc(collection(db, "info"), {
+        // Doc ID-ն դարձնում ենք հենց user.uid-ը (ոչ թե random addDoc ID)
+        await setDoc(doc(db, "info", user.uid), {
           uid: user.uid,
           email: user.email,
           name: user.displayName || '',
           about: '',
+          role: 'user',
           photoURL: user.photoURL || '',
           createdAt: serverTimestamp(),
         });
@@ -115,11 +118,13 @@ function Login() {
       const userCredential = await createUserWithEmailAndPassword(auth, username, password);
       const user = userCredential.user;
 
-      await addDoc(collection(db, "info"), {
+      // Doc ID-ն դարձնում ենք հենց user.uid-ը (ոչ թե random addDoc ID)
+      await setDoc(doc(db, "info", user.uid), {
         uid: user.uid,
         email: username,
         name: name,
         about: about,
+        role: 'user',
         createdAt: serverTimestamp(),
       });
 
