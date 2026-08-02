@@ -51,7 +51,6 @@ function formatDuration(seconds) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-// Blob → base64 string (data URL)
 function blobToBase64(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -77,8 +76,6 @@ function Avatar({ name, uid, size = 40 }) {
   );
 }
 
-// Firestore document-ի max size 1MB է. base64-ը հումքային չափից ~33% ավելի մեծ է,
-// ուստի raw audio blob-ը սահմանափակում ենք ~700KB-ով (անվտանգության մարժայով)
 const MAX_AUDIO_BYTES = 700 * 1024;
 
 export default function Chat() {
@@ -161,7 +158,6 @@ export default function Chat() {
     setText("");
   };
 
-  // Ձայնագրություն սկսել
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -186,7 +182,6 @@ export default function Chat() {
     }
   };
 
-  // Ձայնագրություն կանգնեցնել և ուղարկել (base64-ով, ուղիղ Firestore)
   const stopRecordingAndSend = () => {
     if (!mediaRecorderRef.current) return;
 
@@ -212,7 +207,6 @@ export default function Chat() {
     mediaRecorderRef.current.stop();
   };
 
-  // Ձայնագրությունը չեղարկել
   const cancelRecording = () => {
     if (!mediaRecorderRef.current) return;
     clearInterval(recordingIntervalRef.current);
@@ -252,7 +246,6 @@ export default function Chat() {
 
   return (
     <div className="w-full h-screen flex bg-gray-50">
-      {/* Ձախ sidebar */}
       <div className="w-80 bg-white border-r border-gray-100 flex flex-col">
         <div className="px-5 py-5 border-b border-gray-100 flex items-center justify-between">
           <div>
@@ -299,7 +292,6 @@ export default function Chat() {
         </div>
       </div>
 
-      {/* Աջ մասը՝ chat */}
       <div className="flex-1 flex flex-col min-h-0">
         {selectedUser ? (
           <>

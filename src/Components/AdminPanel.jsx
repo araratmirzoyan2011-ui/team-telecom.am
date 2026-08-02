@@ -38,9 +38,7 @@ export default function AdminPanel() {
   const handleDelete = async (userDoc) => {
     setLoadingId(userDoc.id);
     try {
-      // Ջնջում ենք "info" doc-ը
       await deleteDoc(doc(db, "info", userDoc.id));
-      // Ուզածիդ դեպքում կարող ես նաև ջնջել chats collection-ից համապատասխան զրույցները
     } catch (err) {
       console.error("Ջնջման սխալ:", err);
       alert("Չհաջողվեց ջնջել, փորձիր կրկին");
