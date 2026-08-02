@@ -18,6 +18,9 @@ import TeamTv from "./pages/TeamTv";
 import MyTeam from "./pages/MyTeam";
 import TeamPay from "./pages/TeamPay";
 import TeamEnergy from "./pages/TeamEnergy";
+import { imp } from "./Components/input";
+import ResultsAndReporting from "./pages/res";
+import Sus from "./pages/sus";
 function App() {
   return (
     <BrowserRouter>
@@ -41,7 +44,8 @@ function App() {
           <Route path="/MyTeam" element={<MyTeam />} />
           <Route path="/TeamPay" element={<TeamPay />} />
           <Route path="/TeamEnergy" element={<TeamEnergy />} />
-          
+          <Route path="/res" element={<ResultsAndReporting />} />
+          <Route path="/sus" element={<Sus />} />
         </Routes>
       </div>
     </BrowserRouter>

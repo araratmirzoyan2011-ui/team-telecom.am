@@ -546,9 +546,9 @@ export default function Footer() {
             <Link to="/conmus" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Connections museum</Link>
             <Link to="/news" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">News</Link>
             <Link to="/carrer" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Career in Telecom Armenia</Link>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Results and reporting</p>
+            <Link to="/res" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Results and reporting</Link>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Corporate Ethics and Compliance</p>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Sustainable Development</p>
+            <Link to="/sus" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Sustainable Development</Link>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">To shareholders</p>
           </div>
 
