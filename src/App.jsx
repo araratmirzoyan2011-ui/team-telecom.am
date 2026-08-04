@@ -22,6 +22,8 @@ import { imp } from "./Components/input";
 import ResultsAndReporting from "./pages/res";
 import Sus from "./pages/sus";
 import Tosh from "./pages/Tosh";
+import TermandCon from "./pages/TermandCon";
+import Security from "./pages/Security";
 function App() {
   return (
     <BrowserRouter>
@@ -48,6 +50,8 @@ function App() {
           <Route path="/res" element={<ResultsAndReporting />} />
           <Route path="/sus" element={<Sus />} />
           <Route path="/Tosh" element={<Tosh />} />
+          <Route path="/TermandCon" element={<TermandCon />} />
+          <Route path="/Security" element={<Security />} />
         </Routes>
       </div>
     </BrowserRouter>

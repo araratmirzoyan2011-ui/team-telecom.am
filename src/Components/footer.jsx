@@ -559,8 +559,8 @@ export default function Footer() {
               className="w-[60px] h-[60px]"
             />
             <h1 className="mt-5 text-xl max-[1000px]:mt-5 max-[1000px]:text-lg">Information</h1>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Terms and conditions</p>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Security</p>
+            <Link to="/TermandCon" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Terms and conditions</Link>
+            <Link to="/Security" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Security</Link>
             <Link to="/paymanner" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">E-shop terms</Link>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Credit terms</p>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Delivery terms</p>

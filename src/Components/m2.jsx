@@ -1,3 +1,4 @@
+// Components/m2.jsx (Select)
 import { useState, useEffect } from "react";
 
 function ChevronDown({ className }) {
@@ -29,12 +30,16 @@ export function Select({ sectionsData, title }) {
 
   const current = sectionsData.find((s) => s.glname === selected);
 
+  // Dynamic-որեն գտնում ենք name, name2, name3, name4, name5... քանի հատ էլ լինեն
   const groups = current
-    ? [
-        { title: current.name, items: current.files },
-        { title: current.name2, items: current.files2 },
-        { title: current.name3, items: current.files3 },
-      ].filter((g) => g.title && Array.isArray(g.items) && g.items.length > 0)
+    ? Object.keys(current)
+        .filter((key) => key === "name" || /^name\d+$/.test(key))
+        .map((nameKey) => {
+          const suffix = nameKey === "name" ? "" : nameKey.replace("name", "");
+          const filesKey = "files" + suffix;
+          return { title: current[nameKey], items: current[filesKey] };
+        })
+        .filter((g) => g.title && Array.isArray(g.items) && g.items.length > 0)
     : [];
 
   return (
@@ -86,9 +91,9 @@ export function Select({ sectionsData, title }) {
                   {isOpen && (
                     <div className="pb-6 pl-2 space-y-2 text-slate-600">
                       {g.items.map((f, fi) => (
-                        <a key={fi} href="#" className="block hover:text-teal-500 underline">
+                        <p key={fi} className="block">
                           {f}
-                        </a>
+                        </p>
                       ))}
                     </div>
                   )}
