@@ -549,7 +549,7 @@ export default function Footer() {
             <Link to="/res" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Results and reporting</Link>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Corporate Ethics and Compliance</p>
             <Link to="/sus" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Sustainable Development</Link>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">To shareholders</p>
+            <Link to="/Tosh" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">To shareholders</Link>
           </div>
 
           <div className="mt-[60px] ml-[100px] max-[1100px]:ml-[50px]">

@@ -21,6 +21,7 @@ import TeamEnergy from "./pages/TeamEnergy";
 import { imp } from "./Components/input";
 import ResultsAndReporting from "./pages/res";
 import Sus from "./pages/sus";
+import Tosh from "./pages/Tosh";
 function App() {
   return (
     <BrowserRouter>
@@ -46,6 +47,7 @@ function App() {
           <Route path="/TeamEnergy" element={<TeamEnergy />} />
           <Route path="/res" element={<ResultsAndReporting />} />
           <Route path="/sus" element={<Sus />} />
+          <Route path="/Tosh" element={<Tosh />} />
         </Routes>
       </div>
     </BrowserRouter>
