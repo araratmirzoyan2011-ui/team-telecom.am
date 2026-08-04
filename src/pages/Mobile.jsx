@@ -11,6 +11,7 @@ import { collection, getDocs, addDoc} from 'firebase/firestore';
 import { db } from "../firebase.js";
 import { Link, useNavigate } from 'react-router-dom';
 import { Select } from '../Components/m3.jsx';
+import Pl from '../Components/mobinp.jsx';
 import { useState, useEffect } from 'react';
 function Mobile() {
     const navigate = useNavigate();
@@ -60,7 +61,7 @@ const mobileSectionsData = [
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COMBO" />
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Home phone" />
         </div>
-         <div className='ml-[15%] w-[50%] h-[600px] mt-[100px]'>
+         <div className='ml-[15%] w-[50%] mb-[100px] mt-[100px]'>
                 <div className='flex gap-[40px] border-b border-gray-200'>
                     <h1
                         onClick={() => setActiveTab("Prepaid")}
@@ -83,15 +84,16 @@ const mobileSectionsData = [
                         Postpaid
                     </h1>
                 </div>
-                {activeTab === "Prepaid" ? (
-                    <div className='flex h-[90%]'>
-                        <Select sectionsData={mobileSectionsData} title="Mobile" />
-                    </div>
-                ) : (
-                    <div className='flex h-[90%]'>
-                        
-                    </div>
-                )}
+               {activeTab === "Prepaid" ? (
+    <div className='h-[90%]'>
+        <Select sectionsData={mobileSectionsData} title="Mobile" />
+        <Pl />
+    </div>
+) : (
+    <div className='flex h-[90%]'>
+        <Select sectionsData={mobileSectionsData} title="Mobile" />
+    </div>
+)}
             </div>                
         <Footer />
         </>
