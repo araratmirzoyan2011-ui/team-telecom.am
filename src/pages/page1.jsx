@@ -68,6 +68,7 @@ function Main() {
     className='mt-40 mb-10'
     bgImage="https://www.telecomarmenia.am/images/promo/1/16509682370213.png"
     sizeClass="w-[47%] h-[300px] max-[1100px]:w-[47%] max-[1100px]:h-[200px]"
+    onClickHandler={() => navigate('/Mobile')}
   />
   <Border1
     inf1="Fixed"

@@ -24,6 +24,7 @@ import Sus from "./pages/sus";
 import Tosh from "./pages/Tosh";
 import TermandCon from "./pages/TermandCon";
 import Security from "./pages/Security";
+import Mobile from "./pages/Mobile";
 function App() {
   return (
     <BrowserRouter>
@@ -52,6 +53,7 @@ function App() {
           <Route path="/Tosh" element={<Tosh />} />
           <Route path="/TermandCon" element={<TermandCon />} />
           <Route path="/Security" element={<Security />} />
+          <Route path="/Mobile" element={<Mobile />} />
         </Routes>
       </div>
     </BrowserRouter>
