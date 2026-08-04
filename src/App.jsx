@@ -30,6 +30,7 @@ import M2M from "./pages/M2m";
 import CorEth from "./pages/CorEthCon";
 import Coverage from "./pages/Coverage";
 import DeliveryTable from "./pages/deliveryTerm";
+import UsfullDoc from "./pages/UsfullDoc";
 function App() {
   return (
     <BrowserRouter>
@@ -64,6 +65,7 @@ function App() {
           <Route path="/CorEthCon" element={<CorEth/>} />
           <Route path="/Coverage" element={<Coverage/>} />
           <Route path="/deliveryTerm" element={<DeliveryTable/>} />
+          <Route path="/UsfullDoc" element={<UsfullDoc/>} />
         </Routes>
       </div>
     </BrowserRouter>

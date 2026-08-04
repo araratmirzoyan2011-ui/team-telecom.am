@@ -117,7 +117,8 @@ function Shop() {
             {border6(
                 "Credit terms", "Best terms from Team", "details",
                 "bg-[#689097] w-[38%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
-                "https://www.telecomarmenia.am/images/promo/1/16509757444797.png"
+                "https://www.telecomarmenia.am/images/promo/1/16509757444797.png",
+                () => navigate('/Creditterm')
             )}
         </div>
 
