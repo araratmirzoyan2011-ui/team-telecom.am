@@ -26,6 +26,7 @@ import TermandCon from "./pages/TermandCon";
 import Security from "./pages/Security";
 import Mobile from "./pages/Mobile";
 import Corporate from "./pages/Corporate";
+import M2M from "./pages/M2m";
 function App() {
   return (
     <BrowserRouter>
@@ -56,6 +57,7 @@ function App() {
           <Route path="/Security" element={<Security />} />
           <Route path="/Mobile" element={<Mobile />} />
           <Route path="/Corporate" element={<Corporate />} />
+          <Route path="/M2m" element={<M2M/>} />
         </Routes>
       </div>
     </BrowserRouter>
