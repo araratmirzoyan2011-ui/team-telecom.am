@@ -547,7 +547,7 @@ export default function Footer() {
             <Link to="/news" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">News</Link>
             <Link to="/carrer" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Career in Telecom Armenia</Link>
             <Link to="/res" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Results and reporting</Link>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Corporate Ethics and Compliance</p>
+            <Link to="/CorEthCon" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Corporate Ethics and Compliance</Link>
             <Link to="/sus" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Sustainable Development</Link>
             <Link to="/Tosh" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">To shareholders</Link>
           </div>
