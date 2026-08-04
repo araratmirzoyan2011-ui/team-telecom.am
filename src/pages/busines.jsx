@@ -6,9 +6,8 @@ import { collection, getDocs, addDoc} from 'firebase/firestore';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { db } from "../firebase.js";
-// import { border } from '../text.jsx';
 import { border7 } from '../Components/border7.jsx';
 import { header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
@@ -21,6 +20,7 @@ import { m5 } from '../Components/busmas51.jsx';
 function Busines(){
     const [count, setCount] = useState(0)
     const [slides2, setSlides] = useState([]);
+    const navigate = useNavigate();
     useEffect(() => {
     const fetchSlides = async () => {
       const snapshot = await getDocs(collection(db, "slides2"));
@@ -59,7 +59,7 @@ function Busines(){
 </div>
   {gic()}
       <div className="mt-[100px] ml-[10%] w-4/5 h-[700px] flex flex-row flex-wrap justify-around max-[1100px]:mt-10">
-  {border3("Corporate Network", "Reliable information exchange system", "https://www.telecomarmenia.am/images/promo/1/16509737068164.png")}
+  {border3("Corporate Network", "Reliable information exchange system", "https://www.telecomarmenia.am/images/promo/1/16509737068164.png", () => navigate('/Corporate'))}
   {border3("Mobile ID", "Payments and identification using mobile phone", "https://www.telecomarmenia.am/images/promo/1/16509737228197.png")}
   {border3("M2M solutions", "Reliable data transfer", "https://www.telecomarmenia.am/images/promo/1/16509737385483.png")}
   {border3("SMS-info", "Bulk messaging serviceV", "https://www.telecomarmenia.am/images/promo/1/16509737509423.png")}

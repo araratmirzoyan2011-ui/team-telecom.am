@@ -1,6 +1,6 @@
-export function border3(inf1, inf2, bgImage) {
+export function border3(inf1, inf2, bgImage,onClickHandler) {
   return (
-    <div className="flex justify-between rounded-[10px] text-white bg-[#083f58] w-[47%] h-[300px] max-[1100px]:h-[200px] max-[1100px]:flex-col max-[1100px]:items-center">
+    <div className="flex justify-between rounded-[10px] text-white bg-[#083f58] w-[47%] h-[300px] max-[1100px]:h-[200px] max-[1100px]:flex-col max-[1100px]:items-center" onClick={onClickHandler}>
       <div className="w-1/2 h-full flex flex-col items-center justify-around opacity-0 translate-y-5 animate-[fadeInUp_3s_ease-out_forwards]">
         <h1>{inf1}</h1>
         <p className="vol max-[1000px]:hidden">{inf2}</p>

@@ -7,10 +7,10 @@ export function hborder3(vernagir, text) {
                  transition-all duration-300 shadow-md hover:scale-[1.01] hover:shadow-xl hover:text-black"
     >
       <div className="w-full h-[20%] text-center text-gray-500 transition-all duration-1000 group-hover:bg-cyan-400 group-hover:text-black">
-        <h1>{vernagir}</h1>
+        <h1 className="text-[32px] text-black">{vernagir}</h1>
       </div>
 
-      <p>{text}</p>
+      <p className="text-[18px]">{text}</p>
 
       {button()}
     </div>
