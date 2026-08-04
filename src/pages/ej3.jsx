@@ -6,7 +6,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { db } from "../firebase.js";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
 import { slider4 } from '../Components/slider4.jsx';
@@ -18,7 +18,7 @@ import { border6 } from '../Components/border6.jsx';
 function Shop() {
     const [news2, setNews] = useState([]);
     const [slides3, setSlides] = useState([]);
-
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchData = async () => {
             const newsSnapshot = await getDocs(collection(db, "news2"));
@@ -100,12 +100,14 @@ function Shop() {
             {border6(
                 "Corporate Network", "Reliable information exchange system", "Buy",
                 "bg-[#96d1db] w-[47%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
-                "https://www.telecomarmenia.am/images/promo/1/16509756564861.png"
+                "https://www.telecomarmenia.am/images/promo/1/16509756564861.png",
+                () => navigate('/')
             )}
             {border6(
                 "Delivery terms", "Delivery all over Armenia", "details",
                 "bg-[#012e42] w-[47%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
-                "https://www.telecomarmenia.am/images/promo/1/16509757089642.png"
+                "https://www.telecomarmenia.am/images/promo/1/16509757089642.png",
+                () => navigate('/deliveryTerm')
             )}
             {border6(
                 "Online credit", "What is this and how it works?", "details",
