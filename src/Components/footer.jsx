@@ -565,7 +565,7 @@ export default function Footer() {
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Credit terms</p>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Delivery terms</p>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Sales and service centers</p>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Coverage</p>
+            <Link to="/Coverage" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Coverage</Link>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Mobile network coverage areas</p>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Team internet available areas</p>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Useful documents</p>
