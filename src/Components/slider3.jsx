@@ -26,9 +26,9 @@ export function sl3(sl) {
               />
 
               <div className="w-1/2 flex flex-col justify-center items-start pl-[10%] z-[2] text-white">
-                <h1 className="sliderh1 text-[3rem] m-0 mb-5">{slide.title}</h1>
-                <p className="sliderp1 text-[1.2rem] mb-[30px]">{slide.text}</p>
-                <button className="sliderbutton1 px-[30px] py-[10px] rounded-[20px] border-none cursor-pointer">
+                <h1 className="mt-[10px] text-[3rem] m-0 mb-5">{slide.title}</h1>
+                <p className="mt-[10px] text-[28px] text-[1.2rem] mb-[30px]">{slide.text}</p>
+                <button className="mt-[10px] bg-white text-red-500 px-[30px] py-[10px] rounded-[20px] border-none cursor-pointer">
                   Details
                 </button>
               </div>
@@ -56,15 +56,15 @@ export function sl3(sl) {
               }}
             >
               <div className="w-1/2 pl-[10%] text-white z-[2]">
-                <h1 className="sliderh1 text-[3rem] mb-5">{slide.title}</h1>
+                <h1 className=" text-[3rem] mb-5">{slide.title}</h1>
                 <ul className="list-none p-0">
                   {[slide.text1, slide.text2, slide.text3].map((text, i) => (
-                    <li key={i} className="sliderp1 mb-[15px] flex items-center">
+                    <li key={i} className="text-[28px] mb-[15px] flex items-center">
                       <span className="mr-[10px] text-[#00d4ff]">✦</span> {text}
                     </li>
                   ))}
                 </ul>
-                <button className="sliderbutton1 mt-[30px] cursor-pointer">Read More</button>
+                <button className="bg-white text-red-500 px-[30px] py-[10px] rounded-[20px] border-none cursor-pointer">Read More</button>
               </div>
 
               <div
