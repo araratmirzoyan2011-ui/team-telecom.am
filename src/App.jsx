@@ -33,6 +33,7 @@ import DeliveryTable from "./pages/deliveryTerm";
 import UsfullDoc from "./pages/UsfullDoc";
 import CreditTable from "./pages/Creditterm";
 import BranchesMap from "./pages/ServiceCenters";
+import CoverageMap from "./pages/MobNetwork";
 function App() {
   return (
     <BrowserRouter>
@@ -70,6 +71,7 @@ function App() {
           <Route path="/UsfullDoc" element={<UsfullDoc/>} />
           <Route path="/Creditterm" element={< CreditTable/>} />
           <Route path="/ServiceCenters" element={< BranchesMap/>} />
+          <Route path="/MobNetwork" element={< CoverageMap/>} />
         </Routes>
       </div>
     </BrowserRouter>

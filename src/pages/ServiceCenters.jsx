@@ -8,7 +8,6 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 import { header as Header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
-import { share } from '../Components/Share.jsx';
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -236,7 +235,6 @@ export default function BranchesMap() {
       <h1 className='text-[48px] ml-[15%] mt-[200px]'>Sales and service centers</h1>
       <div className="flex flex-col md:flex-row h-[800px] w-full font-sans mt-[40px]">
         
-        {/* ՁԱԽ ԿՈՂՄ՝ ՔԱՐՏԵԶ (լայնանում է flex-1-ով) */}
         <div className="flex-1 h-full w-full">
           <MapContainer 
             center={[40.1792, 44.4991]} 
