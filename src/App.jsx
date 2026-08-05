@@ -31,6 +31,7 @@ import CorEth from "./pages/CorEthCon";
 import Coverage from "./pages/Coverage";
 import DeliveryTable from "./pages/deliveryTerm";
 import UsfullDoc from "./pages/UsfullDoc";
+import CreditTable from "./pages/Creditterm";
 function App() {
   return (
     <BrowserRouter>
@@ -66,6 +67,7 @@ function App() {
           <Route path="/Coverage" element={<Coverage/>} />
           <Route path="/deliveryTerm" element={<DeliveryTable/>} />
           <Route path="/UsfullDoc" element={<UsfullDoc/>} />
+          <Route path="/Creditterm" element={< CreditTable/>} />
         </Routes>
       </div>
     </BrowserRouter>
