@@ -569,7 +569,7 @@ export default function Footer() {
             <Link to="/MobNetwork" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Mobile network coverage areas</Link>
             <Link to="/InternetArias" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Team internet available areas</Link>
             <Link to="/UsfullDoc" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Useful documents</Link>
-            <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Partners and suppliers</p>
+            <Link to="/Parthners" className="block text-[rgb(178,173,173)] mt-[10px] no-underline cursor-pointer max-[1000px]:text-xs">Partners and suppliers</Link>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">Privacy policy</p>
             <p className="text-[rgb(178,173,173)] mt-[10px] max-[1000px]:text-xs">RA regions' codes</p>
           </div>
