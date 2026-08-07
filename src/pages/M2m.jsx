@@ -19,7 +19,7 @@ function M2M() {
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510702991504/45x45.png" text="SMS-info" />
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Intellectual communications" />
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Corporate Network" />
-            <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="M2M and monitoring" />
+            <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="M2M and monitoring"  onClickHandler={() => navigate('/M2m')}/>
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Hosting" />
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Cost control" />
         </div>

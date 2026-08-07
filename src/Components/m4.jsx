@@ -1,24 +1,13 @@
 import { useState, useEffect } from "react";
-import { Border } from "./mobborder2";
-
-function ChevronDown({ className }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  );
-}
+import parth from "./parth";
 
 export function Select({ sectionsData, title, tabs }) {
   const [activeTab, setActiveTab] = useState(tabs ? tabs[0] : null);
   const [selected, setSelected] = useState(sectionsData?.[0]?.glname);
-  const [openIndex, setOpenIndex] = useState(null);
 
   useEffect(() => {
     if (sectionsData?.[0]) {
       setSelected(sectionsData[0].glname);
-      setOpenIndex(null);
     }
   }, [title, sectionsData]);
 
@@ -28,28 +17,19 @@ export function Select({ sectionsData, title, tabs }) {
 
   const selectSection = (glname) => {
     setSelected(glname);
-    setOpenIndex(null);
-  };
-
-  const toggleGroup = (idx) => {
-    setOpenIndex((prev) => (prev === idx ? null : idx));
   };
 
   const current = sectionsData.find((s) => s.glname === selected);
 
-  const groups = current
+  // Հավաքում ենք բոլոր "files"/"filesN" բանալիների items-երը մեկ հարթ ցուցակի մեջ
+  const items = current
     ? Object.keys(current)
-        .filter((key) => key === "name" || /^name\d+$/.test(key))
-        .map((nameKey) => {
-          const suffix = nameKey === "name" ? "" : nameKey.replace("name", "");
-          const filesKey = "files" + suffix;
-          return { title: current[nameKey], items: current[filesKey] };
-        })
-        .filter((g) => g.title && Array.isArray(g.items) && g.items.length > 0)
+        .filter((key) => key === "files" || /^files\d+$/.test(key))
+        .flatMap((key) => (Array.isArray(current[key]) ? current[key] : []))
     : [];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="w-full px-4 py-10">
       {/* Breadcrumb */}
       <div className="text-sm text-gray-500 mb-6">
         <span className="underline">Home</span>
@@ -80,9 +60,9 @@ export function Select({ sectionsData, title, tabs }) {
         </div>
       )}
 
-      <div className="flex gap-10 items-start">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start">
         {/* Sidebar */}
-        <div className="w-72 shrink-0">
+        <div className="w-full lg:w-96 shrink-0">
           <h2 className="text-xl font-bold text-slate-800 mb-6 px-1">
             Choose your package
           </h2>
@@ -107,38 +87,11 @@ export function Select({ sectionsData, title, tabs }) {
           </div>
         </div>
 
-        <div className="flex-1 sticky top-[120px] self-start">
-          {groups.length > 0 ? (
-            groups.map((g, idx) => {
-              const isOpen = openIndex === idx;
-              return (
-                <div key={idx} className="border-b border-gray-200">
-                  <button
-                    onClick={() => toggleGroup(idx)}
-                    className="w-full flex items-center justify-between py-6 text-3xl font-black text-slate-800"
-                  >
-                    {g.title}
-                    <ChevronDown
-                      className={`w-6 h-6 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
-
-                  {isOpen && (
-                    <div className="pb-6 space-y-3">
-                      {g.items.map((f, fi) => (
-                        <Border
-                          key={fi}
-                          gb={f.gb}
-                          min={f.min}
-                          chanell={f.chanell}
-                          Amd={f.Amd}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })
+        <div className="w-full flex-1 lg:sticky lg:top-[120px] self-start">
+          {items.length > 0 ? (
+            <div className="mt-10">
+              {parth()}
+            </div>
           ) : (
             <p className="text-gray-400 pt-6">Դեռ հաշվետվություն չկա</p>
           )}

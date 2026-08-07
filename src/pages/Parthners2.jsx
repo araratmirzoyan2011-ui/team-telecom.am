@@ -13,33 +13,8 @@ import { Select } from '../Components/m4.jsx';
 import Pl from '../Components/mobinp.jsx';
 import { useState, useEffect } from 'react';
 
-function Parthner() {
+function Parthners2() {
     const navigate = useNavigate();
-
-    const mobileSectionsData = [
-        {
-            glname: "Qualifications",
-            name: "",
-            files: [
-                
-            ],
-        },
-        {
-            glname: "Supplier competitive selection",
-            name: "",
-            files: [
-                
-            ],
-        },
-        {
-            glname: "Potential partners",
-            name: "",
-            files: [
-                "asd"
-            ],
-        },
-       
-    ];
 
     return (
         <>
@@ -51,16 +26,11 @@ function Parthner() {
                 <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510719725688/45x45.png" text="Parthners" onClickHandler={() => navigate('/Parthners2')} />
                 
             </div>
-            <h1 className='ml-[15%] mt-[100px] text-[48px]'>Procurements</h1>
-            <div className='ml-[10%] w-[85%] mb-[100px] mt-[20px]'>
-                <div className='h-[90%]'>
-                    <Select sectionsData={mobileSectionsData} title="Mobile" />
-                    
-                </div>
-            </div>
+            <h1 className='ml-[15%] mt-[100px] text-[48px] mb-[60px]'>Parthner</h1>
+            
             <Footer />
         </>
     )
 }
 
-export default Parthner
+export default Parthners2

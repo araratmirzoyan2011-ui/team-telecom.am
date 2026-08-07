@@ -55,7 +55,7 @@ function Shop() {
         </Swiper>
         </div>
 
-        <div className="mt-[140px] w-[90%] ml-[5%] h-[100px] flex flex-row flex-nowrap justify-around max-[900px]:h-[210px] max-[900px]:flex-wrap max-[900px]:w-1/2 max-[900px]:ml-[25%]">
+        <div className="mt-[140px] w-[90%] ml-[5%] h-[100px] flex flex-row flex-nowrap justify-around max-[900px]:flex-wrap max-[900px]:w-1/2 max-[900px]:ml-[25%]">
             {border4("fa-solid fa-mobile-button", "Smartphones")}
             {border4("fa-solid fa-mobile-vibrate", "Numbers")}
             {border4("fa-solid fa-computer", "Devices")}
