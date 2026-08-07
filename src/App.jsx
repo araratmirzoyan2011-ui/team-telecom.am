@@ -38,6 +38,7 @@ import Internet from "./pages/InternetArias";
 import Parthner from "./pages/Parthners";
 import Parthners2 from "./pages/Parthners2";
 import Sales from "./pages/Sales";
+import Policy from "./pages/Privacy-Policy";
 function App() {
   return (
     <BrowserRouter>
@@ -80,6 +81,7 @@ function App() {
           <Route path="/Parthners" element={< Parthner/>} />
           <Route path="/Parthners2" element={< Parthners2/>} />
           <Route path="/Sales" element={< Sales/>} />
+          <Route path="/Privacy-Policy" element={<Policy/>} />
         </Routes>
       </div>
     </BrowserRouter>
