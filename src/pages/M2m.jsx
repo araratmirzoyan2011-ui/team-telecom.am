@@ -10,7 +10,9 @@ import { hborder3 } from "../Components/hborder3.jsx";
 import { collection, getDocs, addDoc} from 'firebase/firestore';
 import { Link } from 'react-router-dom';
 import { db } from "../firebase.js";
+import { useNavigate } from 'react-router-dom';
 function M2M() {
+    const navigate = useNavigate();
     return (
         <>
         {header()}
@@ -21,7 +23,7 @@ function M2M() {
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Corporate Network" />
             <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="M2M and monitoring"  onClickHandler={() => navigate('/M2m')}/>
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Hosting" />
-            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Cost control" />
+            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Cost control" onClickHandler={() => navigate('/Cost-Control')}/>
         </div>
         <h1 className="text-[40px] ml-[10%] text-[rgb(22,20,20)] mt-[100px]">Corporate Network</h1>
         <div className="w-[80%] h-[300px] mt-[50px] ml-[10%] mb-[150px] grid grid-cols-3 gap-5 max-xl:grid-cols-3 max-[800px]:grid-cols-2 max-[800px]:h-[900px] max-[700px]:grid-cols-1">

@@ -40,6 +40,8 @@ import Parthners2 from "./pages/Parthners2";
 import Sales from "./pages/Sales";
 import Policy from "./pages/Privacy-Policy";
 import Code from "./pages/region-code";
+import IC from "./pages/intelect-comunication";
+import CostControl from "./pages/Cost-Control";
 function App() {
   return (
     <BrowserRouter>
@@ -48,8 +50,10 @@ function App() {
           <Route path="/page1" element={<Main />} />
           <Route path="/business" element={<Busines />} />
           <Route path="/ej3" element={<Shop />} />
+          <Route path="/intelect-comunication" element={<IC/>} />
           <Route path="/" element={<Main />} />
           <Route path="/region-code" element={<Code />} />
+          <Route path="/Cost-Control" element={<CostControl/>} />
           <Route path="/about-us" element={<About />} />
           <Route path="/news/:id" element={<NewsPage />} />
           <Route path="/paymanner" element={<Paymanner />} />
