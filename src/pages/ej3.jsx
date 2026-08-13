@@ -101,7 +101,7 @@ function Shop() {
                 "Corporate Network", "Reliable information exchange system", "Buy",
                 "bg-[#96d1db] w-[47%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
                 "https://www.telecomarmenia.am/images/promo/1/16509756564861.png",
-                () => navigate('/')
+                () => navigate('/Corporate')
             )}
             {border6(
                 "Delivery terms", "Delivery all over Armenia", "details",
@@ -112,7 +112,8 @@ function Shop() {
             {border6(
                 "Online credit", "What is this and how it works?", "details",
                 "bg-[#9d9991] w-[56%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
-                "https://www.telecomarmenia.am/images/promo/1/16509758156906.png"
+                "https://www.telecomarmenia.am/images/promo/1/16509758156906.png",
+                () => navigate('/Online-Credit')
             )}
             {border6(
                 "Credit terms", "Best terms from Team", "details",
