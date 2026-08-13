@@ -93,39 +93,46 @@ function OnlineCredit() {
     ];
 
     const navigate = useNavigate();
-    return (
-        <>
-        {header()}
-            <div className='mt-[100px] w-full h-[500px] grid grid-cols-2 bg-[#083f58]'>
-                <N2
-                src='https://www.telecomarmenia.am/images/block_with_text/1/16510468752809.png'
-                h1='Online credit'
-                p='Online credit enables you to make purchases from online shop (e-Shop) by paying with credit.'
-                button='e-Shop'
-                col="text-white"
-              />
-            </div>
-            <div className='w-full h-[500px] bg-[#083f58]'>
-                <N1 arr={arr1} h1='How to get online credit? (EVOCABANK)' />
-            </div>
-            <div className='w-full h-[500px] bg-[#083f58]'>
-                <N1 arr={arr1acba} h1='How to get online credit? (Acba bank)' />
-            </div>
-            <div className='w-full h-[500px] bg-[#083f58]'>
-                <N1 arr={arr2} h1='How to get online credit (VTB BANK)' />
-            </div>
-            <div className='w-full h-[500px] grid grid-cols-2'>
-                <N2
-                src='https://www.telecomarmenia.am/images/block_with_text/1/16510468889316.png'
-                h1='Nice numbers'
-                p='Nice numbers available by online credit with VTB bank'
-                button='Buy now'
-                col="text-[#083f58]"
-              />
-            </div>
-            <Faq leftItems={faqLeft} rightItems={faqRight} />
-        <Footer />
-        </>
-    )
+    // ...
+return (
+  <>
+    {header()}
+
+    <div className='mt-[100px] w-full min-h-[500px] grid grid-cols-1 md:grid-cols-2 bg-[#083f58]'>
+      <N2
+        src='https://www.telecomarmenia.am/images/block_with_text/1/16510468752809.png'
+        h1='Online credit'
+        p='Online credit enables you to make purchases from online shop (e-Shop) by paying with credit.'
+        button='e-Shop'
+        col="text-white"
+      />
+    </div>
+
+    <div className='w-full h-auto bg-[#083f58]'>
+      <N1 arr={arr1} h1='How to get online credit? (EVOCABANK)' />
+    </div>
+
+    <div className='w-full h-auto bg-[#083f58]'>
+      <N1 arr={arr1acba} h1='How to get online credit? (Acba bank)' />
+    </div>
+
+    <div className='w-full h-auto bg-[#083f58]'>
+      <N1 arr={arr2} h1='How to get online credit (VTB BANK)' />
+    </div>
+
+    <div className='w-full min-h-[500px] grid grid-cols-1 md:grid-cols-2'>
+      <N2
+        src='https://www.telecomarmenia.am/images/block_with_text/1/16510468889316.png'
+        h1='Nice numbers'
+        p='Nice numbers available by online credit with VTB bank'
+        button='Buy now'
+        col="text-[#083f58]"
+      />
+    </div>
+
+    <Faq leftItems={faqLeft} rightItems={faqRight} />
+    <Footer />
+  </>
+);
 }
 export default OnlineCredit
