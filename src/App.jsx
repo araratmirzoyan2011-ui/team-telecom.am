@@ -43,6 +43,7 @@ import Code from "./pages/region-code";
 import IC from "./pages/intelect-comunication";
 import CostControl from "./pages/Cost-Control"
 import OnlineCredit from "./pages/Online-Credit";
+import MobileID from "./pages/Mobile-Id";
 function App() {
   return (
     <BrowserRouter>
@@ -51,6 +52,7 @@ function App() {
           <Route path="/page1" element={<Main />} />
           <Route path="/business" element={<Busines />} />
           <Route path="/Online-Credit" element={<OnlineCredit/>} />
+          <Route path="/Mobile-Id" element={<MobileID/>} />
           <Route path="/ej3" element={<Shop />} />
           <Route path="/intelect-comunication" element={<IC/>} />
           <Route path="/" element={<Main />} />

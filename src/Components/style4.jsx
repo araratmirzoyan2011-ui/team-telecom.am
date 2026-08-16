@@ -1,4 +1,4 @@
-export function N2({ src, h1, p, button, col }) {
+export function N2({ src, h1, p,col }) {
   return (
     <>
       <div className="flex justify-center items-center p-6">
@@ -8,7 +8,6 @@ export function N2({ src, h1, p, button, col }) {
           alt="" 
         />
       </div>
-
       <div className={`${col} flex flex-col justify-center items-center md:items-start text-center md:text-left p-6 md:pt-10`}>
         <h1 className="font-sans text-3xl md:text-5xl lg:text-[60px] font-bold leading-tight">
           {h1}
@@ -18,9 +17,6 @@ export function N2({ src, h1, p, button, col }) {
           {p}
         </p>
 
-        <button className="mt-6 w-[200px] h-[44px] bg-red-500 text-white rounded-full text-lg border-none hover:bg-red-600 transition-colors cursor-pointer">
-          {button}
-        </button>
       </div>
     </>
   );
