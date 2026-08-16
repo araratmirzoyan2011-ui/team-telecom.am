@@ -15,9 +15,9 @@ export function m5() {
       >
         <h1 className="mt-5">VIRTUAL PBX</h1>
         <div className="mt-10 flex flex-row justify-around w-[70%] h-[250px] max-[750px]:flex-col">
-          {ph("Routing the calls: not a single call to be missed", "https://www.telecomarmenia.am/img/virtual-icon-1.png")}
-{ph("Recording the conversations and call statistics", "https://www.telecomarmenia.am/img/virtual-icon-2.png")}
-{ph("Voice assistant for the customers", "https://www.telecomarmenia.am/img/virtual-icon-3.png")}
+          {ph({ text: "Routing the calls: not a single call to be missed", src: "https://www.telecomarmenia.am/img/virtual-icon-1.png" })}
+{ph({ text: "Recording the conversations and call statistics", src: "https://www.telecomarmenia.am/img/virtual-icon-2.png" })}
+{ph({ text: "Voice assistant for the customers", src: "https://www.telecomarmenia.am/img/virtual-icon-3.png" })}
         </div>
         <div className="bg-white text-red-600 rounded-[20px] mt-10 w-[200px] h-10 text-center max-[750px]:mt-[350px]">
           <h1>Read More</h1>
