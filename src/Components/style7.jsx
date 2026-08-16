@@ -1,4 +1,4 @@
-import { ph as Ph } from './ph';
+import {Ph} from './ph2';
 
 export function N1({ arr, h1,p }) {
   return (
@@ -8,7 +8,7 @@ export function N1({ arr, h1,p }) {
       </h1>
       <div className="w-full max-w-6xl grid grid-cols-4 gap-8 max-[750px]:grid-cols-1  max-[750px]:gap-12">
         {arr.map((el, index) => (
-          <Ph key={index} src={el[0]} text={el[1]} />
+          <Ph key={index} src={el[0]} title={el[1]} text={el[2]} />
         ))}
       </div>
     </div>

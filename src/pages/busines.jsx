@@ -62,7 +62,7 @@ function Busines(){
   {border3("Corporate Network", "Reliable information exchange system", "https://www.telecomarmenia.am/images/promo/1/16509737068164.png", () => navigate('/Corporate'))}
   {border3("Mobile ID", "Payments and identification using mobile phone", "https://www.telecomarmenia.am/images/promo/1/16509737228197.png", () => navigate('/Mobile-id'))}
   {border3("M2M solutions", "Reliable data transfer", "https://www.telecomarmenia.am/images/promo/1/16509737385483.png", () => navigate('/M2m'))}
-  {border3("SMS-info", "Bulk messaging serviceV", "https://www.telecomarmenia.am/images/promo/1/16509737509423.png")}
+  {border3("SMS-info", "Bulk messaging serviceV", "https://www.telecomarmenia.am/images/promo/1/16509737509423.png", () => navigate('/SMS'))}
 </div>
       {l()}
       {m5()}
