@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { db } from '../firebase.js';
 import { Link } from 'react-router-dom';
 import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
-import { header } from '../Components/header.jsx';
+import { header as Header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
 import { share } from '../Components/Share.jsx';
 import { text } from '../Components/new-page-condition.jsx';
@@ -27,7 +27,7 @@ function NewsPage() {
 
   return (
     <>
-      {header()}
+      <Header />
       
       {text(news)}
       

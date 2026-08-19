@@ -45,12 +45,14 @@ import CostControl from "./pages/Cost-Control"
 import OnlineCredit from "./pages/Online-Credit";
 import MobileID from "./pages/Mobile-Id";
 import SMS from "./pages/SMS";
+import InternetTV from "./pages/Internet-and-Tv";
 function App() {
   return (
     <BrowserRouter>
       <div className="content">
         <Routes>
           <Route path="/page1" element={<Main />} />
+          <Route path="/Internet-and-Tv" element={<InternetTV />} />
           <Route path="/business" element={<Busines />} />
           <Route path="/Online-Credit" element={<OnlineCredit/>} />
           <Route path="/SMS" element={<SMS/>} />
