@@ -14,15 +14,17 @@ function Hphone() {
     return (
         <>
         {header()}
-        {bgimg("https://www.telecomarmenia.am/images/menu/1/16509749987896.png")}
+        {bgimg("https://www.telecomarmenia.am/images/menu/1/165106349279.png")}
        <div className="mt-[-50px] h-[120px] bg-neutral-100 flex justify-center items-center w-4/5 ml-[10%] max-[1200px]:w-[90%] max-[1200px]:ml-[5%] max-[900px]:w-[94%] max-[900px]:ml-[3%]">
-            <HBorder url="https://www.telecomarmenia.am/files/icons/1/1651070448779/45x45.png" text="Mobile"  onClickHandler={() => navigate('/Mobile')} />
-            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COSMO" />
-            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COMBO" />
+            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510708352906/45x45.png" text="Mobile"  onClickHandler={() => navigate('/Mobile')} />
+            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511222304797/45x45.png" text="Internet and TV - COSMO" />
+            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511222214647/45x45.png" text="Internet and TV - COMBO" />
+            <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/1651122209593/45x45.png" text="Home phone"  onClickHandler={() => navigate('/home-phone')}/>
+            
             <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Home phone"  onClickHandler={() => navigate('/home-phone')}/>
         </div>
-        <h1 className="text-[40px] ml-[10%] text-[rgb(22,20,20)] mt-[100px]">Home phone</h1>
-        <div className="w-[80%] h-[500px] mt-[50px] ml-[10%] mb-[150px] grid grid-cols-4 gap-5 max-xl:grid-cols-3 max-[800px]:grid-cols-2 max-[800px]:h-[900px] max-[700px]:grid-cols-1">
+        <h1 className="text-[40px] ml-[10%] text-[rgb(22,20,20)] mt-[100px]">Top up & 0 balance</h1>
+        <div className="w-[80%] h-[500px] mt-[50px] ml-[10%] mb-[150px] grid grid-cols-3 gap-5 max-xl:grid-cols-3 max-[800px]:grid-cols-2 max-[800px]:h-[900px] max-[700px]:grid-cols-1">
             {hborder3("Favorite","Fixed telephone for home")}
             {hborder3("Basic 1","Fixed telephone for home")}
             {hborder3("Basic 2","Fixed telephone for home")}
