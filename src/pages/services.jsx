@@ -26,8 +26,8 @@ function Services() {
             <div className="w-[80%] ml-[10%] mb-[150px] grid grid-cols-3 gap-5 max-xl:grid-cols-3 max-[800px]:grid-cols-2 max-[700px]:grid-cols-1">
                
                 {hborder3(
-                    "Roaming activation terms", 
-                    ""
+                    "Roaming package 1 GB", 
+                    "Internet package for subscribers in Russia, Georgia."
                 )}
                                 
             </div>
@@ -36,20 +36,20 @@ function Services() {
             <div className="w-[80%] ml-[10%] mb-[150px] grid grid-cols-3 gap-5 max-xl:grid-cols-3 max-[800px]:grid-cols-2 max-[700px]:grid-cols-1">
                
                 {hborder3(
-                    "Roaming activation terms", 
-                    ""
+                    "Roaming package 1 GB +", 
+                    "Ideal for 2–5-day trips. Stay connected via Social Media, use Google Maps with confidence, check your email, and browse websites."
                 )}
                 {hborder3(
-                    "Roaming activation terms", 
-                    ""
+                    "Roaming package 4 GB", 
+                    "Ideal for 5–10-day trips. Enjoy active use of social media, make voice and video calls, stream music, use search engines, and share photos and videos while you're away."
                 )}
                 {hborder3(
-                    "Roaming activation terms", 
-                    ""
+                    "Roaming package 10 GB", 
+                    "Enjoy active use of all your favorite social media platforms, watch videos, make long video calls, and browse the internet with greater freedom."
                 )}
                 {hborder3(
-                    "Roaming activation terms", 
-                    ""
+                    "Roaming package 20 GB", 
+                    "An excellent choice for those who want to stay connected wherever they go, without worrying about running out of mobile data."
                 )}            
             </div>
             <h1 className="text-[40px] ml-[10%] font-bold text-[rgb(22,20,20)] mt-[60px] mb-[40px]">International</h1>
@@ -57,8 +57,8 @@ function Services() {
             <div className="w-[80%] ml-[10%] mb-[150px] grid grid-cols-3 gap-5 max-xl:grid-cols-3 max-[800px]:grid-cols-2 max-[700px]:grid-cols-1">
                
                 {hborder3(
-                    "Roaming activation terms", 
-                    ""
+                    "Armenians' World", 
+                    "International calls at lower tariffs"
                 )}
                                 
             </div>
