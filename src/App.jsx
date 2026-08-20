@@ -52,6 +52,7 @@ import Payment from "./pages/PaymentService";
 import Entertainment from "./pages/Entertainment";
 import CallSecurity from "./pages/calls-security";
 import HomePhone2 from "./pages/home-phone2";
+import InternationalCalls from "./pages/international-calls";
 function App() {
   return (
     <BrowserRouter>
@@ -60,6 +61,7 @@ function App() {
           <Route path="/page1" element={<Main />} />
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
           <Route path="/Entertainment" element={<Entertainment />} />
+          <Route path="/international-calls" element={<InternationalCalls />} />
           <Route path="/home-phone2" element={<HomePhone2 />} />
           <Route path="/calls-security" element={<CallSecurity />} />
            <Route path="/PaymentService" element={<Payment />} />
