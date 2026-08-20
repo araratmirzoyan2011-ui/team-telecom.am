@@ -48,6 +48,7 @@ import SMS from "./pages/SMS";
 import InternetTV from "./pages/Internet-and-Tv";
 import ForSmartphone from "./pages/forSmartphones";
 import PcTablet from "./pages/ForPcTablet";
+import Payment from "./pages/PaymentService";
 function App() {
   return (
     <BrowserRouter>
@@ -55,6 +56,7 @@ function App() {
         <Routes>
           <Route path="/page1" element={<Main />} />
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
+           <Route path="/PaymentService" element={<Payment />} />
           <Route path="/ForPcTablet" element={<PcTablet />} />
           <Route path="/forSmartphones" element={<ForSmartphone />} />
           <Route path="/business" element={<Busines />} />
