@@ -47,6 +47,7 @@ import MobileID from "./pages/Mobile-Id";
 import SMS from "./pages/SMS";
 import InternetTV from "./pages/Internet-and-Tv";
 import ForSmartphone from "./pages/forSmartphones";
+import PcTablet from "./pages/ForPcTablet";
 function App() {
   return (
     <BrowserRouter>
@@ -54,6 +55,7 @@ function App() {
         <Routes>
           <Route path="/page1" element={<Main />} />
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
+          <Route path="/ForPcTablet" element={<PcTablet />} />
           <Route path="/forSmartphones" element={<ForSmartphone />} />
           <Route path="/business" element={<Busines />} />
           <Route path="/Online-Credit" element={<OnlineCredit/>} />
