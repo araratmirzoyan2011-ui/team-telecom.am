@@ -50,6 +50,7 @@ import ForSmartphone from "./pages/forSmartphones";
 import PcTablet from "./pages/ForPcTablet";
 import Payment from "./pages/PaymentService";
 import Entertainment from "./pages/Entertainment";
+import CallSecurity from "./pages/calls-security";
 function App() {
   return (
     <BrowserRouter>
@@ -58,6 +59,7 @@ function App() {
           <Route path="/page1" element={<Main />} />
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
           <Route path="/Entertainment" element={<Entertainment />} />
+          <Route path="/calls-security" element={<CallSecurity />} />
            <Route path="/PaymentService" element={<Payment />} />
           <Route path="/ForPcTablet" element={<PcTablet />} />
           <Route path="/forSmartphones" element={<ForSmartphone />} />

@@ -7,7 +7,7 @@ import { HBorder2 } from "../Components/hborder2.jsx";
 import { hborder3 } from "../Components/hborder3.jsx";
 import BannerCard from "../Components/hborder4.jsx";
 
-function CallSecurity() {
+function HomePhone2() {
     const navigate = useNavigate();
 
     return (
@@ -19,8 +19,8 @@ function CallSecurity() {
                 <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510708352906/45x45.png" text="TeamTV" onClickHandler={() => navigate('/team-tv')} />
                 <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511222304797/45x45.png" text="Payment services" onClickHandler={() => navigate('/PaymentService')} />
                 <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511222214647/45x45.png" text="Entertainment" onClickHandler={() => navigate('/Entertainment')} />
-                <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/1651122209593/45x45.png" text="Calls & security" onClickHandler={() => navigate('/calls-security')} />
-                <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Home phone" onClickHandler={() => navigate('/home-phone2')} />
+                <HBorder url="https://www.telecomarmenia.am/files/icons/1/1651122209593/45x45.png" text="Calls & security" onClickHandler={() => navigate('/calls-security')} />
+                <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Home phone" onClickHandler={() => navigate('/home-phone2')} />
             </div>
 
             <h1 className="text-[40px] ml-[10%] font-bold text-[rgb(22,20,20)] mt-[60px] mb-[40px]">Calls & Security</h1>
@@ -87,4 +87,4 @@ function CallSecurity() {
     );
 }
 
-export default CallSecurity;
+export default HomePhone2;
