@@ -6,7 +6,7 @@ import { HBorder } from "../Components/hborder.jsx";
 import { HBorder2 } from "../Components/hborder2.jsx";
 import { hborder3 } from "../Components/hborder3.jsx";
 import BannerCard from "../Components/hborder4.jsx";
-import { ChooseCountry } from '../Components/ChooseCountre.jsx';
+import { InteractiveMap } from '../Components/ChooseCountre.jsx';
 function InternationalCalls() {
     const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ function InternationalCalls() {
             </div>
             
             <h1 className="text-[40px] ml-[10%] font-bold text-[rgb(22,20,20)] mt-[60px] mb-[40px]">International calls</h1>
-            
+            <InteractiveMap />
             
             <Footer />
         </>

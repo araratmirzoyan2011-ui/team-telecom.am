@@ -12,7 +12,8 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.3.3",
-    "firebase": "^12.15.0",
+    "d3-geo": "^3.1.1",
+    "firebase": "^12.18.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.28.0",
     "rc-pagination": "^5.1.0",
@@ -22,6 +23,7 @@
     "react-paginate": "^8.3.0",
     "react-router-dom": "^7.18.0",
     "react-simple-image-slider": "^2.4.1",
+    "react-simple-maps": "^3.0.0",
     "swiper": "^12.2.0",
     "tailwindcss": "^4.3.3"
   },
