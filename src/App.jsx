@@ -60,6 +60,7 @@ import HomeCombo from "./pages/combo";
 import Subscription from "./pages/subscription";
 import TeamTv2 from "./pages/teamtv2";
 import Koreez from "./pages/Koreez";
+import Gfn from "./pages/gfn-games";
 function App() {
   return (
     <BrowserRouter>
@@ -69,6 +70,7 @@ function App() {
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
           <Route path="/services" element={<Services />} />
           <Route path="/useful-information" element={<Useful />} />
+          <Route path="/gfn-games" element={<Gfn />} />
           <Route path="/teamtv2" element={<TeamTv2/>} />
           <Route path="/Entertainment" element={<Entertainment />} />
           <Route path="/Koreez" element={<Koreez />} />
