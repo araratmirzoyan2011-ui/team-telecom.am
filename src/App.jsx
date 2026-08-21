@@ -61,7 +61,7 @@ import Subscription from "./pages/subscription";
 import TeamTv2 from "./pages/teamtv2";
 import Koreez from "./pages/Koreez";
 import Gfn from "./pages/gfn-games";
-// import mobibattle2 from "./pages/mobibattle";
+import TeamBonus from "./pages/team-bonus";
 import Mobibattle2 from "./pages/mobibattle";
 function App() {
   return (
@@ -73,6 +73,7 @@ function App() {
           <Route path="/mobibattle" element={<Mobibattle2 />} />
           <Route path="/services" element={<Services />} />
           <Route path="/useful-information" element={<Useful />} />
+          <Route path="/team-bonus" element={<TeamBonus />} />
           <Route path="/gfn-games" element={<Gfn />} />
           <Route path="/teamtv2" element={<TeamTv2/>} />
           <Route path="/Entertainment" element={<Entertainment />} />
