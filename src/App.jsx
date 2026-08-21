@@ -59,6 +59,7 @@ import Combo from "./pages/combo-tariffs";
 import HomeCombo from "./pages/combo";
 import Subscription from "./pages/subscription";
 import TeamTv2 from "./pages/teamtv2";
+import Koreez from "./pages/Koreez";
 function App() {
   return (
     <BrowserRouter>
@@ -70,6 +71,7 @@ function App() {
           <Route path="/useful-information" element={<Useful />} />
           <Route path="/teamtv2" element={<TeamTv2/>} />
           <Route path="/Entertainment" element={<Entertainment />} />
+          <Route path="/Koreez" element={<Koreez />} />
           <Route path="/subscription" element={<Subscription />} />
           <Route path="/international-calls" element={<InternationalCalls />} />
           <Route path="/combo" element={<HomeCombo />} />
