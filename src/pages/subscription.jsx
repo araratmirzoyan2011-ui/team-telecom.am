@@ -44,11 +44,15 @@ function Subscription() {
             <div className='w-full h-auto bg-[#083f58] py-8'>
                 <N1 arr={arr1} h1='How to Buy Number by Subscription?' />
             </div>
-            <N3
-                src='https://www.telecomarmenia.am/images/block_with_text/1/17761517712737.png'
-                h1='Be Free at a special price'
-                p='Become a subscriber of one of the COSMO or COMBO packages and get up to 3 SIM cards at special rates'
-            />
+            <div className='w-full min-h-[500px] flex items-center justify-center bg-[#01415f]'>
+                <N2
+                    src="https://www.telecomarmenia.am/images/block_with_text/1/16832074143841.png"
+                    h1='Nice numbers'
+                    p="Nice numbers available by online credit with VTB bank"
+                    col="text-white"
+                    button="Buy now"
+                />
+            </div>
 
 
             <Faq leftItems={faqLeft} rightItems={faqRight} title='Terms' />
