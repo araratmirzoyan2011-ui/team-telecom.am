@@ -105,30 +105,32 @@ function Main() {
   <h1>Newsfeed</h1>
 </div>
 
-      <div className="mt-[60px] w-full px-5 box-border h-[600px] bg-white max-[1000px]:w-[500px]">
-  <Swiper
-    modules={[Navigation, Pagination]}
-    spaceBetween={30}
-    slidesPerView={3}
-    slidesPerGroup={3}
-    navigation={true}
-    pagination={{ clickable: true }}
-    style={{ width: "100%", paddingBottom: "40px" }}
-    breakpoints={{
-      0: {
-        slidesPerView: 2,
-        slidesPerGroup: 2,
-        spaceBetween: 20,
-      },
-      1000: {
-        slidesPerView: 3,
-        slidesPerGroup: 3,
-        spaceBetween: 30,
-      },
-    }}
-  >
-    {sli2(news, navigate)}
-  </Swiper>
+ <div className="mt-[60px] w-full px-5 box-border h-[600px] bg-white flex justify-center max-[1000px]:w-[500px] mx-auto">
+  <div className="w-full max-w-[1200px]"> {/* Այս div-ը պահում է ընդհանուր լայնությունը կենտրոնացված */}
+    <Swiper
+      modules={[Navigation, Pagination]}
+      spaceBetween={30}
+      slidesPerView={3}
+      slidesPerGroup={3}
+      navigation={true}
+      pagination={{ clickable: true }}
+      style={{ width: "100%", paddingBottom: "40px" }}
+      breakpoints={{
+        0: {
+          slidesPerView: 2,
+          slidesPerGroup: 2,
+          spaceBetween: 20,
+        },
+        1000: {
+          slidesPerView: 3,
+          slidesPerGroup: 3,
+          spaceBetween: 30,
+        },
+      }}
+    >
+      {sli2(news, navigate)}
+    </Swiper>
+  </div>
 </div>
 
       {gic()}
