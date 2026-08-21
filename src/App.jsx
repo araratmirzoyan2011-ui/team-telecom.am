@@ -58,6 +58,7 @@ import Services from "./pages/services";
 import Combo from "./pages/combo-tariffs";
 import HomeCombo from "./pages/combo";
 import Subscription from "./pages/subscription";
+import TeamTv2 from "./pages/teamtv2";
 function App() {
   return (
     <BrowserRouter>
@@ -67,6 +68,7 @@ function App() {
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
           <Route path="/services" element={<Services />} />
           <Route path="/useful-information" element={<Useful />} />
+          <Route path="/teamtv2" element={<TeamTv2/>} />
           <Route path="/Entertainment" element={<Entertainment />} />
           <Route path="/subscription" element={<Subscription />} />
           <Route path="/international-calls" element={<InternationalCalls />} />
