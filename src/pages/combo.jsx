@@ -1,3 +1,6 @@
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from "../firebase.js";
+
 import { header as Header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
 import { bgimg } from "../Components/bg.jsx";
@@ -6,6 +9,29 @@ import PackageCard from '../Components/PackageCard.jsx';
 import { N3 } from '../Components/style5.jsx';
 import { N8 } from '../Components/stile8.jsx';
 import { TariffCards } from '../Components/Tariff-Card.jsx';
+import { N1 } from '../Components/N1-1.jsx';
+import { Faq } from '../Components/Faq.jsx';
+
+const arr1 = [
+    ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/16496614699749.png", "Catch-Up up-to 7 days"],
+    ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/1649661469994.png", "Huge Video Library"],
+    ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/1649661469994.png", "YouTube on TV"],
+];
+
+export const faqLeft = [
+    {
+        q: "Be Free on special terms",
+        a: "Here you can place the detailed terms and conditions regarding the Be Free special offer."
+    }
+];
+
+export const faqRight = [
+    {
+        q: "Additional information",
+        a: "Here you can place additional rules, descriptions, or conditions related to the package."
+    }
+];
+
 const comboPackagesData = [
     {
         id: "1", feeAmount: "9900", heading: "COMBO 4 9900",
@@ -55,6 +81,7 @@ function HomeCombo() {
     return (
         <>
             <Header />
+
             {bgimg("https://www.telecomarmenia.am/images/sliders_block_slides/1/17494570057719.png")}
             
             <div className='w-full min-h-[500px] flex items-center justify-center bg-[#024566]'>
@@ -96,29 +123,39 @@ function HomeCombo() {
                     );
                 })}
             </div>
-                <N3
-                        src='https://www.telecomarmenia.am/images/block_with_text/1/17761517712737.png'
-                        h1='Be Free at a special price'
-                        p='Become a subscriber of one of the COSMO or COMBO packages and get up to 3 SIM cards at special rates'
-                      />
-                      <div className="w-full bg-[#024566] py-16 px-4">
-                              <div className='w-full flex justify-center text-white text-[32px] md:text-[48px] mb-[40px] text-center'>
-                                <h1>Get Be Free packages at a special price</h1>
-                              </div>
-                              <div className="max-w-7xl mx-auto">
-                                <div className="flex flex-wrap justify-center items-stretch gap-6">
-                                  <TariffCards />
-                                </div>
-                              </div>
-                            </div>
-                <div className='w-full min-h-[500px]  flex justify-center items-center'>
-                      <N8
-                        h1='Send a request'
-                        p='Check maximal speed of home Internet by sending a request․'
-                        button='Join'
-                        col="text-[#01425f]"
-                      />
+
+            <N3
+                src='https://www.telecomarmenia.am/images/block_with_text/1/17761517712737.png'
+                h1='Be Free at a special price'
+                p='Become a subscriber of one of the COSMO or COMBO packages and get up to 3 SIM cards at special rates'
+            />
+
+            <div className="w-full bg-[#024566] py-16 px-4">
+                <div className='w-full flex justify-center text-white text-[32px] md:text-[48px] mb-[40px] text-center'>
+                    <h1>Get Be Free packages at a special price</h1>
+                </div>
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex flex-wrap justify-center items-stretch gap-6">
+                        <TariffCards />
                     </div>
+                </div>
+            </div>
+
+            <div className='w-full min-h-[500px] flex justify-center items-center'>
+                <N8
+                    h1='Send a request'
+                    p='Check maximal speed of home Internet by sending a request․'
+                    button='Join'
+                    col="text-[#01425f]"
+                />
+            </div>
+
+            <div className='w-full h-auto bg-[#083f58] py-8'>
+                <N1 arr={arr1} h1='TeamTV' />
+            </div>
+
+            <Faq leftItems={faqLeft} rightItems={faqRight} title='Terms' />
+            
             <Footer />
         </>
     );
