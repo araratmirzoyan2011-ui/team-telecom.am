@@ -5,6 +5,7 @@ import { N2 } from '../Components/style2.jsx';
 import { Faq } from '../Components/Faq.jsx';
 import { ph as Ph } from '../Components/ph';
 import { useState } from 'react';
+import { N8 } from '../Components/stile8.jsx';
 import { S1 } from '../Components/st1.jsx';
 const arr2 = [
   { 
@@ -25,28 +26,36 @@ const arr2 = [
 
 export const faqLeft = [
     {
-        q: "What does it mean to purchase a number by subscription?",
-        a: "Here you can place the detailed description of purchasing a number by subscription."
+        q: "Can channels list change?",
+        a: "Here you can place the detailed description about channels list changes."
     },
     {
-        q: "What are the conditions for purchasing a number by subscription?",
-        a: "Here you can place the conditions regarding the subscription purchase."
+        q: "How can i start to use the new TV?",
+        a: "Here you can place instructions on how to start using the new TV."
+    },
+    {
+        q: "How can i restore my password?",
+        a: "Here you can place instructions on how to restore your password."
     }
 ];
 
 export const faqRight = [
     {
-        q: "How to get a number by subscription?",
-        a: "Here you can place instructions on how to get a number by subscription."
+        q: "Where can i find the price list of additional channels?",
+        a: "Here you can place details regarding the price list of additional channels."
     },
     {
-        q: "What happens if contract is terminated before the specified period?",
-        a: "Here you can place details regarding early contract termination."
+        q: "Where can i find channels list?",
+        a: "Here you can place information on where to find the channels list."
     }
 ];
 
 function TeamTv2() {
     const [activeTab, setActiveTab] = useState(0);
+    const packages = {
+        home: ["80 channels", "120 channels", "150 channels", "200 channels"],
+        mobile: ["20 channels", "30 channels", "40 channels", "60 channels", "110 channels"]
+    };
     return (
         <>
             <Header />
@@ -153,7 +162,46 @@ function TeamTv2() {
                 col="text-white"
 />
                 </div>
-            <Faq leftItems={faqLeft} rightItems={faqRight} title='FAQ' />
+                <div className='w-full max-w-4xl mx-auto my-16 px-4'>
+                <div className='flex justify-center mb-8'>
+                    <h2 className='text-[36px] font-bold text-[#024566]'>Available packages</h2>
+                </div>
+
+                <div className='flex flex-col sm:flex-row bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden cursor-pointer'>
+                    <div 
+                        onClick={() => setActiveTab(0)}
+                        className={`flex-1 flex items-center justify-center gap-4 py-6 px-8 transition-all ${activeTab === 0 ? 'bg-[#01425f] text-white' : 'bg-white text-[#01425f]'}`}
+                    >
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20h6l-.75-3M12 17v-4m0 0L8.25 9M12 13l3.75-4m-12.75 3h18.5a1.5 1.5 0 011.5 1.5v6a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5v-6a1.5 1.5 0 011.5-1.5z" /></svg>
+                        <span className='text-xl font-medium'>For home</span>
+                    </div>
+
+                    <div 
+                        onClick={() => setActiveTab(1)}
+                        className={`flex-1 flex items-center justify-center gap-4 py-6 px-8 transition-all ${activeTab === 1 ? 'bg-[#01425f] text-white' : 'bg-white text-[#01425f]'}`}
+                    >
+                        <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        <span className='text-xl font-medium'>For mobile</span>
+                    </div>
+                </div>
+
+                <div className='mt-8 bg-white rounded-lg shadow-sm border border-gray-100'>
+                    {(activeTab === 0 ? packages.home : packages.mobile).map((item, index) => (
+                        <div key={index} className='text-center py-6 text-lg text-[#01425f] font-medium border-b border-gray-200 last:border-0'>
+                            {item}
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <div className='w-full min-h-[500px] flex justify-center items-center bg-[#01415f]'>
+                <N8
+                    h1='Send a request'
+                    p='Check maximal speed of home Internet by sending a request․'
+                    button='Join'
+                    col="text-white"
+                />
+            </div>
+            <Faq leftItems={faqLeft} rightItems={faqRight} title='Useful information' />
             
             <Footer />
         </>
