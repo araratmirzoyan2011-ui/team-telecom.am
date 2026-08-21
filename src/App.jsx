@@ -57,6 +57,7 @@ import Useful from "./Components/useful-information";
 import Services from "./pages/services";
 import Combo from "./pages/combo-tariffs";
 import HomeCombo from "./pages/combo";
+import Subscription from "./pages/subscription";
 function App() {
   return (
     <BrowserRouter>
@@ -67,6 +68,7 @@ function App() {
           <Route path="/services" element={<Services />} />
           <Route path="/useful-information" element={<Useful />} />
           <Route path="/Entertainment" element={<Entertainment />} />
+          <Route path="/subscription" element={<Subscription />} />
           <Route path="/international-calls" element={<InternationalCalls />} />
           <Route path="/combo" element={<HomeCombo />} />
           <Route path="/combo-tariffs" element={<Combo />} />
