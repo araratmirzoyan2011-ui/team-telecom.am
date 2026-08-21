@@ -5,6 +5,7 @@ import { N2 } from '../Components/style2.jsx';
 import { Faq } from '../Components/Faq.jsx';
 import { ph as Ph } from '../Components/ph';
 import { useState } from 'react';
+import { S1 } from '../Components/st1.jsx';
 const arr2 = [
   { 
     img: "https://www.telecomarmenia.am/file_manager/cosmo/icons/2_icon.png", 
@@ -140,6 +141,18 @@ function TeamTv2() {
                     )}
                 </div>
             </div>
+            <div className='mt-[100px] w-full min-h-[500px] grid grid-cols-1 md:grid-cols-2 bg-[#01415f]'>
+                 <S1
+                src='https://www.youtube.com/embed/ZqXUbLS1dRw' 
+                h1='New TeamTV guideline'
+                p='- New design
+                - Channels list by genres and opportunity to watch 2 channels simultaneously
+                - Creation of favorite films list
+                - Search of particular programs
+                - Devices management'
+                col="text-white"
+/>
+                </div>
             <Faq leftItems={faqLeft} rightItems={faqRight} title='FAQ' />
             
             <Footer />
