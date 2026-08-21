@@ -13,7 +13,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Select } from '../Components/m3.jsx';
 import Pl from '../Components/mobinp.jsx';
 import { useState, useEffect } from 'react';
-function Mobile() {
+function Combo() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("Prepaid");
     // Mobile.jsx-ի սկզբում, imports-ից հետո
@@ -58,45 +58,12 @@ const mobileSectionsData = [
        <div className="mt-[-50px] h-[120px] bg-neutral-100 flex justify-center items-center w-4/5 ml-[10%] max-[1200px]:w-[90%] max-[1200px]:ml-[5%] max-[900px]:w-[94%] max-[900px]:ml-[3%]">
             <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/1651070448779/45x45.png" text="Mobile" onClickHandler={() => navigate('/Mobile')} />
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COSMO"  onClickHandler={() => navigate('/Internet-and-Tv')} />
-            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COMBO"  onClickHandler={() => navigate('/combo-tariffs')}/>
+            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COMBO"  onClickHandler={() => navigate('/forSmartphones')}/>
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Home phone"  onClickHandler={() => navigate('/home-phone')}/>
         </div>
-         <div className='ml-[15%] w-[50%] mb-[100px] mt-[100px]'>
-                <div className='flex gap-[40px] border-b border-gray-200'>
-                    <h1
-                        onClick={() => setActiveTab("Prepaid")}
-                        className={`pb-[12px] cursor-pointer text-[18px] ${
-                            activeTab === "Prepaid"
-                                ? "border-b-2 border-cyan-400 text-black"
-                                : "text-gray-400"
-                        }`}
-                    >
-                        Prepaid
-                    </h1>
-                    <h1
-                        onClick={() => setActiveTab("android")}
-                        className={`pb-[12px] cursor-pointer text-[18px] ${
-                            activeTab === " Postpaid"
-                                ? "border-b-2 border-cyan-400 text-black"
-                                : "text-gray-400"
-                        }`}
-                    >
-                        Postpaid
-                    </h1>
-                </div>
-               {activeTab === "Prepaid" ? (
-    <div className='h-[90%]'>
-        <Select sectionsData={mobileSectionsData} title="Mobile" />
-        <Pl />
-    </div>
-) : (
-    <div className='flex h-[90%]'>
-        <Select sectionsData={mobileSectionsData} title="Mobile" />
-    </div>
-)}
-            </div>                
+                      
         <Footer />
         </>
     )
 }
-export default Mobile
+export default Combo

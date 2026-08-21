@@ -17,8 +17,8 @@ function Hphone() {
         {bgimg("https://www.telecomarmenia.am/images/menu/1/16509749987896.png")}
        <div className="mt-[-50px] h-[120px] bg-neutral-100 flex justify-center items-center w-4/5 ml-[10%] max-[1200px]:w-[90%] max-[1200px]:ml-[5%] max-[900px]:w-[94%] max-[900px]:ml-[3%]">
             <HBorder url="https://www.telecomarmenia.am/files/icons/1/1651070448779/45x45.png" text="Mobile"  onClickHandler={() => navigate('/Mobile')} />
-            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COSMO" />
-            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COMBO" />
+            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COSMO" onClickHandler={()=>navigate('/Internet-and-Tv')}/>
+            <HBorder url="https://www.telecomarmenia.am/files/icons/1/16511223989344/45x45.png" text="Internet and TV - COMBO" onClickHandler={()=>navigate('/combo-tariffs')}/>
             <HBorder2 url="https://www.telecomarmenia.am/files/icons/1/16510709622802/45x45.png" text="Home phone"  onClickHandler={() => navigate('/home-phone')}/>
         </div>
         <h1 className="text-[40px] ml-[10%] text-[rgb(22,20,20)] mt-[100px]">Home phone</h1>
