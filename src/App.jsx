@@ -61,6 +61,8 @@ import Subscription from "./pages/subscription";
 import TeamTv2 from "./pages/teamtv2";
 import Koreez from "./pages/Koreez";
 import Gfn from "./pages/gfn-games";
+// import mobibattle2 from "./pages/mobibattle";
+import Mobibattle2 from "./pages/mobibattle";
 function App() {
   return (
     <BrowserRouter>
@@ -68,6 +70,7 @@ function App() {
         <Routes>
           <Route path="/page1" element={<Main />} />
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
+          <Route path="/mobibattle" element={<Mobibattle2 />} />
           <Route path="/services" element={<Services />} />
           <Route path="/useful-information" element={<Useful />} />
           <Route path="/gfn-games" element={<Gfn />} />
