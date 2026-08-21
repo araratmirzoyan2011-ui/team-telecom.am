@@ -14,15 +14,23 @@ const arr1 = [
 
 export const faqLeft = [
     {
-        q: "Be Free on special terms",
-        a: "Here you can place the detailed terms and conditions regarding the Be Free special offer."
+        q: "What does it mean to purchase a number by subscription?",
+        a: "Here you can place the detailed description of purchasing a number by subscription."
+    },
+    {
+        q: "What are the conditions for purchasing a number by subscription?",
+        a: "Here you can place the conditions regarding the subscription purchase."
     }
 ];
 
 export const faqRight = [
     {
-        q: "Additional information",
-        a: "Here you can place additional rules, descriptions, or conditions related to the package."
+        q: "How to get a number by subscription?",
+        a: "Here you can place instructions on how to get a number by subscription."
+    },
+    {
+        q: "What happens if contract is terminated before the specified period?",
+        a: "Here you can place details regarding early contract termination."
     }
 ];
 
@@ -55,7 +63,7 @@ function Subscription() {
             </div>
 
 
-            <Faq leftItems={faqLeft} rightItems={faqRight} title='Terms' />
+            <Faq leftItems={faqLeft} rightItems={faqRight} title='FAQ' />
             
             <Footer />
         </>
