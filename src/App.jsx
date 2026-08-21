@@ -56,6 +56,7 @@ import InternationalCalls from "./pages/international-calls";
 import Useful from "./Components/useful-information";
 import Services from "./pages/services";
 import Combo from "./pages/combo-tariffs";
+import HomeCombo from "./pages/combo";
 function App() {
   return (
     <BrowserRouter>
@@ -67,6 +68,7 @@ function App() {
           <Route path="/useful-information" element={<Useful />} />
           <Route path="/Entertainment" element={<Entertainment />} />
           <Route path="/international-calls" element={<InternationalCalls />} />
+          <Route path="/combo" element={<HomeCombo />} />
           <Route path="/combo-tariffs" element={<Combo />} />
           <Route path="/home-phone2" element={<HomePhone2 />} />
           <Route path="/calls-security" element={<CallSecurity />} />
