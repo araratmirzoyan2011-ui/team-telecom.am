@@ -1,5 +1,9 @@
-
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
+import { useCartStore } from "./Components/useCartStore";
+
 import Main from "./pages/page1";
 import Busines from "./pages/busines";
 import Shop from "./pages/ej3";
@@ -8,7 +12,7 @@ import "./App.css";
 import NewsPage from './pages/new-page';
 import Paymanner from "./pages/paymanner";
 import Connections from "./pages/conmus";
-import News from "./pages/news"
+import News from "./pages/news";
 import Carrer from "./pages/carrer";
 import Hphone from "./pages/home-phone";
 import Login from "./pages/login";
@@ -41,7 +45,7 @@ import Sales from "./pages/Sales";
 import Policy from "./pages/Privacy-Policy";
 import Code from "./pages/region-code";
 import IC from "./pages/intelect-comunication";
-import CostControl from "./pages/Cost-Control"
+import CostControl from "./pages/Cost-Control";
 import OnlineCredit from "./pages/Online-Credit";
 import MobileID from "./pages/Mobile-Id";
 import SMS from "./pages/SMS";
@@ -64,7 +68,19 @@ import Gfn from "./pages/gfn-games";
 import TeamBonus from "./pages/team-bonus";
 import Mobibattle2 from "./pages/mobibattle";
 import Card from "./pages/Card";
+
 function App() {
+  const loadUserData = useCartStore((state) => state.loadUserData);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loadUserData();
+      }
+    });
+    return () => unsubscribe();
+  }, [loadUserData]);
+
   return (
     <BrowserRouter>
       <div className="content">
@@ -77,7 +93,7 @@ function App() {
           <Route path="/useful-information" element={<Useful />} />
           <Route path="/team-bonus" element={<TeamBonus />} />
           <Route path="/gfn-games" element={<Gfn />} />
-          <Route path="/teamtv2" element={<TeamTv2/>} />
+          <Route path="/teamtv2" element={<TeamTv2 />} />
           <Route path="/Entertainment" element={<Entertainment />} />
           <Route path="/Koreez" element={<Koreez />} />
           <Route path="/subscription" element={<Subscription />} />
@@ -86,26 +102,26 @@ function App() {
           <Route path="/combo-tariffs" element={<Combo />} />
           <Route path="/home-phone2" element={<HomePhone2 />} />
           <Route path="/calls-security" element={<CallSecurity />} />
-           <Route path="/PaymentService" element={<Payment />} />
+          <Route path="/PaymentService" element={<Payment />} />
           <Route path="/ForPcTablet" element={<PcTablet />} />
           <Route path="/forSmartphones" element={<ForSmartphone />} />
           <Route path="/business" element={<Busines />} />
-          <Route path="/Online-Credit" element={<OnlineCredit/>} />
-          <Route path="/SMS" element={<SMS/>} />
-          <Route path="/Mobile-Id" element={<MobileID/>} />
+          <Route path="/Online-Credit" element={<OnlineCredit />} />
+          <Route path="/SMS" element={<SMS />} />
+          <Route path="/Mobile-Id" element={<MobileID />} />
           <Route path="/ej3" element={<Shop />} />
-          <Route path="/intelect-comunication" element={<IC/>} />
+          <Route path="/intelect-comunication" element={<IC />} />
           <Route path="/" element={<Main />} />
           <Route path="/region-code" element={<Code />} />
-          <Route path="/Cost-Control" element={<CostControl/>} />
+          <Route path="/Cost-Control" element={<CostControl />} />
           <Route path="/about-us" element={<About />} />
           <Route path="/news/:id" element={<NewsPage />} />
           <Route path="/paymanner" element={<Paymanner />} />
           <Route path="/conmus" element={<Connections />} />
-          <Route path="/news" element={<News/>} />
-          <Route path="/carrer" element={<Carrer/>} />
-          <Route path="/home-phone" element={<Hphone/>} />
-          <Route path="/login" element={<Login/>} />
+          <Route path="/news" element={<News />} />
+          <Route path="/carrer" element={<Carrer />} />
+          <Route path="/home-phone" element={<Hphone />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/user" element={<User />} />
           <Route path="/Applications" element={<Applicate />} />
           <Route path="/TeamTv" element={<TeamTv />} />
@@ -119,19 +135,19 @@ function App() {
           <Route path="/Security" element={<Security />} />
           <Route path="/Mobile" element={<Mobile />} />
           <Route path="/Corporate" element={<Corporate />} />
-          <Route path="/M2m" element={<M2M/>} />
-          <Route path="/CorEthCon" element={<CorEth/>} />
-          <Route path="/Coverage" element={<Coverage/>} />
-          <Route path="/deliveryTerm" element={<DeliveryTable/>} />
-          <Route path="/UsfullDoc" element={<UsfullDoc/>} />
-          <Route path="/Creditterm" element={< CreditTable/>} />
-          <Route path="/ServiceCenters" element={< BranchesMap/>} />
-          <Route path="/MobNetwork" element={< CoverageMap/>} />
-          <Route path="/InternetArias" element={< Internet/>} />
-          <Route path="/Parthners" element={< Parthner/>} />
-          <Route path="/Parthners2" element={< Parthners2/>} />
-          <Route path="/Sales" element={< Sales/>} />
-          <Route path="/Privacy-Policy" element={<Policy/>} />
+          <Route path="/M2m" element={<M2M />} />
+          <Route path="/CorEthCon" element={<CorEth />} />
+          <Route path="/Coverage" element={<Coverage />} />
+          <Route path="/deliveryTerm" element={<DeliveryTable />} />
+          <Route path="/UsfullDoc" element={<UsfullDoc />} />
+          <Route path="/Creditterm" element={<CreditTable />} />
+          <Route path="/ServiceCenters" element={<BranchesMap />} />
+          <Route path="/MobNetwork" element={<CoverageMap />} />
+          <Route path="/InternetArias" element={<Internet />} />
+          <Route path="/Parthners" element={<Parthner />} />
+          <Route path="/Parthners2" element={<Parthners2 />} />
+          <Route path="/Sales" element={<Sales />} />
+          <Route path="/Privacy-Policy" element={<Policy />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -4,8 +4,9 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from "../firebase.js";
 import { auth } from "../firebase.js";
-import { header } from "../Components/header"
+import { header } from "../Components/header";
 import Footer from '../Components/footer.jsx';
+import { useCartStore } from '../Components/useCartStore'; 
 
 const DEFAULT_AVATAR = "https://i.pinimg.com/originals/65/1c/6d/651c6da502353948bdc929f02da2b8e0.jpg?nii=t";
 
@@ -13,6 +14,8 @@ function User() {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const loadUserData = useCartStore((state) => state.loadUserData);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -22,6 +25,8 @@ function User() {
       }
 
       try {
+        await loadUserData();
+
         const q = query(collection(db, "info"), where("uid", "==", currentUser.uid));
         const querySnapshot = await getDocs(q);
 
@@ -32,7 +37,6 @@ function User() {
             photoURL: data.photoURL || currentUser.photoURL || null,
           });
         } else {
-          console.warn("info collection-ում այս user-ի տվյալներ չկան");
           setUserInfo({
             name: currentUser.displayName || '',
             email: currentUser.email || '',
@@ -48,7 +52,7 @@ function User() {
     });
 
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, loadUserData]);
 
   const handleLogout = async () => {
     try {
@@ -90,7 +94,6 @@ function User() {
                 <span className="text-lg font-medium">{userInfo.about}</span>
               </div>
 
-              {/* 🛒 Կոճակների հատվածը (Log out և Card) */}
               <div className="flex items-center gap-4 pt-2">
                 <button
                   onClick={handleLogout}
@@ -100,7 +103,7 @@ function User() {
                 </button>
 
                 <button
-                  onClick={() => navigate("/Card")}
+                  onClick={() => navigate("/card")}
                   className="flex items-center justify-center gap-2 text-white w-[110px] h-[40px] text-[18px] bg-red-600 border border-red-600 rounded-[10px] cursor-pointer hover:bg-red-700 transition-colors"
                 >
                   <i className="fa-solid fa-basket-shopping text-sm"></i>
@@ -118,4 +121,4 @@ function User() {
     </>
   )
 }
-export default User
+export default User;

@@ -1,20 +1,59 @@
 import { create } from 'zustand';
+import { db, auth } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-export const useCartStore = create((set) => ({
+export const useCartStore = create((set, get) => ({
   cart: [],
-  likedItems: [], // Հավանած ապրանքների զանգված
+  likedItems: [],
+  isLoaded: false, 
   
+  loadUserData: async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      set({ isLoaded: true });
+      return;
+    }
+    
+    try {
+      const docRef = doc(db, "wishlists", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        set({ likedItems: docSnap.data().items || [], isLoaded: true });
+      } else {
+        set({ likedItems: [], isLoaded: true });
+      }
+    } catch (error) {
+      console.error("Error loading wishlist:", error);
+      set({ isLoaded: true });
+    }
+  },
+
   addToCart: (item) => set((state) => ({ 
     cart: [...state.cart, item] 
   })),
 
-  // Սրտիկին սեղմելիս ապրանքը ավելանում կամ հեռանում է հավանածների ցանկից
-  toggleLike: (item) => set((state) => {
-    const exists = state.likedItems.some((p) => p.id === item.id || p.text === item.text);
+  toggleLike: async (item) => {
+    const state = get();
+    const user = auth.currentUser;
+
+    const exists = state.likedItems.some((p) => p.text === item.text);
+    let updatedLikes;
+
     if (exists) {
-      return { likedItems: state.likedItems.filter((p) => p.id !== item.id && p.text !== item.text) };
+      updatedLikes = state.likedItems.filter((p) => p.text !== item.text);
     } else {
-      return { likedItems: [...state.likedItems, item] };
+      updatedLikes = [...state.likedItems, item];
     }
-  }),
+
+    set({ likedItems: updatedLikes });
+
+    if (user) {
+      try {
+        const docRef = doc(db, "wishlists", user.uid);
+        await setDoc(docRef, { items: updatedLikes });
+      } catch (error) {
+        console.error("Error saving wishlist:", error);
+      }
+    }
+  },
 }));
