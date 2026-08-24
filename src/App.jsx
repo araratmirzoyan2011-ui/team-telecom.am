@@ -63,6 +63,7 @@ import Koreez from "./pages/Koreez";
 import Gfn from "./pages/gfn-games";
 import TeamBonus from "./pages/team-bonus";
 import Mobibattle2 from "./pages/mobibattle";
+import Card from "./pages/Card";
 function App() {
   return (
     <BrowserRouter>
@@ -70,6 +71,7 @@ function App() {
         <Routes>
           <Route path="/page1" element={<Main />} />
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
+          <Route path="/Card" element={<Card />} />
           <Route path="/mobibattle" element={<Mobibattle2 />} />
           <Route path="/services" element={<Services />} />
           <Route path="/useful-information" element={<Useful />} />

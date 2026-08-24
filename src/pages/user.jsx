@@ -27,7 +27,6 @@ function User() {
 
         if (!querySnapshot.empty) {
           const data = querySnapshot.docs[0].data();
-          // եթե Firestore-ում photoURL չկա, բայց Auth-ում կա (օր. Google user), օգտագործում ենք այն
           setUserInfo({
             ...data,
             photoURL: data.photoURL || currentUser.photoURL || null,
@@ -73,7 +72,7 @@ function User() {
           />
         </div>
 
-        <div className="flex flex-col  p-8">
+        <div className="flex flex-col p-8">
           {isLoading ? (
             <p>Բեռնվում է...</p>
           ) : userInfo ? (
@@ -90,12 +89,25 @@ function User() {
                 <span className="text-xs text-gray-500 block">About</span>
                 <span className="text-lg font-medium">{userInfo.about}</span>
               </div>
-              <button
-                onClick={handleLogout}
-                className="text-red-500 w-[100px] h-[40px] text-[24px] bg-transparent border border-red-600 rounded-[10px] cursor-pointer"
-              >
-                Log out
-              </button>
+
+              {/* 🛒 Կոճակների հատվածը (Log out և Card) */}
+              <div className="flex items-center gap-4 pt-2">
+                <button
+                  onClick={handleLogout}
+                  className="text-red-500 w-[100px] h-[40px] text-[18px] bg-transparent border border-red-600 rounded-[10px] cursor-pointer hover:bg-red-50 transition-colors"
+                >
+                  Log out
+                </button>
+
+                <button
+                  onClick={() => navigate("/cart")}
+                  className="flex items-center justify-center gap-2 text-white w-[110px] h-[40px] text-[18px] bg-red-600 border border-red-600 rounded-[10px] cursor-pointer hover:bg-red-700 transition-colors"
+                >
+                  <i className="fa-solid fa-basket-shopping text-sm"></i>
+                  <span>Card</span>
+                </button>
+              </div>
+
             </div>
           ) : (
             <p>Տվյալներ չեն գտնվել</p>
