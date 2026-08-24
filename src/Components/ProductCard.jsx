@@ -8,38 +8,51 @@ export default function ProductCard({ el, i, isSpecial }) {
   const isLiked = likedItems.some((p) => p.text === el.text);
 
   return (
-    <div className="relative p-[10px] text-black w-full h-[500px] flex flex-col items-center border border-gray-500 bg-[whitesmoke] rounded-[20px] overflow-hidden transition-transform duration-300 ease-in-out [transform-origin:center_center] mt-10 hover:scale-105">
+    <div className="relative p-5 text-black w-full h-[520px] flex flex-col justify-between border border-gray-200 bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-1 my-4">
       
       <button 
         onClick={() => toggleLike(el)}
-        className="absolute top-4 right-4 z-10 text-2xl focus:outline-none transition-transform active:scale-95 cursor-pointer"
+        className="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-white/80 backdrop-blur-md rounded-full shadow-sm hover:scale-110 active:scale-90 transition-transform cursor-pointer"
+        aria-label="Like product"
       >
-        <i className={`fa-solid fa-heart ${isLiked ? 'text-red-600' : 'text-gray-400'}`}></i>
+        <i className={`fa-solid fa-heart text-xl transition-colors duration-200 ${isLiked ? 'text-red-500 scale-110' : 'text-gray-300 hover:text-gray-400'}`}></i>
       </button>
 
-      <p className="ml-5 mt-5 text-xl font-sans">{el.text}</p>
-      <img
-        src={el.src}
-        className="rounded-t-[20px] object-cover w-full h-[200px]"
-        alt=""
-      />
-      <h1 className="mt-[10px]">{el.value}</h1>
+      <div className="w-full h-[210px] flex items-center justify-center overflow-hidden rounded-2xl bg-gray-50">
+        <img
+          src={el.src}
+          className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
+          alt={el.text || "Product image"}
+        />
+      </div>
 
-      {isSpecial ? (
-        <>
-          <div className="w-[91%] h-px bg-gray-500 mt-[15px]"></div>
-          <h1 className="mt-[10px]">{el.amsekan}/per mounth</h1>
-          <div className="mt-5 w-[200px] h-10 flex items-center justify-center bg-red-600 text-white transition-colors duration-1000 rounded-[20px] hover:bg-white hover:text-red-600 cursor-pointer">
-            <i className="fa-solid fa-basket-shopping mr-2"></i>
-            <p>Add to cart</p>
-          </div>
-        </>
-      ) : (
-        <div className="mt-[55px] w-[200px] h-10 flex items-center justify-center bg-red-600 text-white transition-colors duration-1000 rounded-[20px] hover:bg-white hover:text-red-600 cursor-pointer">
+      <div className="flex flex-col flex-grow mt-4">
+        <p className="text-base sm:text-lg font-semibold text-gray-800 line-clamp-2">
+          {el.text}
+        </p>
+        <h2 className="text-xl font-bold text-gray-900 mt-2">
+          {el.value}
+        </h2>
+      </div>
+
+      <div className="mt-auto pt-2">
+        {isSpecial && (
+          <>
+            <div className="w-full h-px bg-gray-200 my-2"></div>
+            <p className="text-sm font-medium text-red-600 mb-2">
+              {el.amsekan} <span className="text-gray-500 font-normal">/ month</span>
+            </p>
+          </>
+        )}
+
+        <button 
+          className="w-full h-11 flex items-center justify-center bg-red-600 text-white font-medium rounded-xl shadow-md hover:bg-red-700 active:scale-[0.98] transition-all duration-200 cursor-pointer"
+        >
           <i className="fa-solid fa-basket-shopping mr-2"></i>
-          <p>Add to cart</p>
-        </div>
-      )}
+          <span>Add to cart</span>
+        </button>
+      </div>
+
     </div>
   );
 }

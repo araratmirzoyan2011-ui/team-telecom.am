@@ -106,7 +106,7 @@ function Main() {
 </div>
 
  <div className="mt-[60px] w-full px-5 box-border h-[600px] bg-white flex justify-center max-[1000px]:w-[500px] mx-auto">
-  <div className="w-full max-w-[1200px]"> {/* Այս div-ը պահում է ընդհանուր լայնությունը կենտրոնացված */}
+  <div className="w-full max-w-[1200px]"> 
     <Swiper
       modules={[Navigation, Pagination]}
       spaceBetween={30}
