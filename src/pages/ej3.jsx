@@ -96,33 +96,32 @@ function Shop() {
         </div>
         {gic()}
 
-        <div className="mt-[100px] ml-[10%] w-4/5 h-[700px] flex flex-row flex-wrap justify-around">
-            {border6(
-                "Corporate Network", "Reliable information exchange system", "Buy",
-                "bg-[#96d1db] w-[47%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
-                "https://www.telecomarmenia.am/images/promo/1/16509756564861.png",
-                () => navigate('/Corporate')
-            )}
-            {border6(
-                "Delivery terms", "Delivery all over Armenia", "details",
-                "bg-[#012e42] w-[47%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
-                "https://www.telecomarmenia.am/images/promo/1/16509757089642.png",
-                () => navigate('/deliveryTerm')
-            )}
-            {border6(
-                "Online credit", "What is this and how it works?", "details",
-                "bg-[#9d9991] w-[56%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
-                "https://www.telecomarmenia.am/images/promo/1/16509758156906.png",
-                () => navigate('/Online-Credit')
-            )}
-            {border6(
-                "Credit terms", "Best terms from Team", "details",
-                "bg-[#689097] w-[38%] max-[1100px]:w-[47%] max-[1000px]:flex-col max-[1000px]:items-center",
-                "https://www.telecomarmenia.am/images/promo/1/16509757444797.png",
-                () => navigate('/Creditterm')
-            )}
-        </div>
-
+        <div className="mt-[100px] mx-auto w-11/12 max-w-7xl flex flex-row flex-wrap justify-center items-center gap-6">
+  {border6(
+    "Corporate Network", "Reliable information exchange system", "Buy",
+    "bg-[#96d1db] w-full lg:w-[57%]",
+    "https://www.telecomarmenia.am/images/promo/1/16509756564861.png",
+    () => navigate('/Corporate')
+  )}
+  {border6(
+    "Delivery terms", "Delivery all over Armenia", "details",
+    "bg-[#012e42] w-full lg:w-[41%]",
+    "https://www.telecomarmenia.am/images/promo/1/16509757089642.png",
+    () => navigate('/deliveryTerm')
+  )}
+  {border6(
+    "Online credit", "What is this and how it works?", "details",
+    "bg-[#9d9991] w-full lg:w-[41%]",
+    "https://www.telecomarmenia.am/images/promo/1/16509758156906.png",
+    () => navigate('/Online-Credit')
+  )}
+  {border6(
+    "Credit terms", "Best terms from Team", "details",
+    "bg-[#689097] w-full lg:w-[57%]",
+    "https://www.telecomarmenia.am/images/promo/1/16509757444797.png",
+    () => navigate('/Creditterm')
+  )}
+</div>
         <Footer />
         </>
     )
