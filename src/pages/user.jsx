@@ -100,7 +100,7 @@ function User() {
                 </button>
 
                 <button
-                  onClick={() => navigate("/cart")}
+                  onClick={() => navigate("/Card")}
                   className="flex items-center justify-center gap-2 text-white w-[110px] h-[40px] text-[18px] bg-red-600 border border-red-600 rounded-[10px] cursor-pointer hover:bg-red-700 transition-colors"
                 >
                   <i className="fa-solid fa-basket-shopping text-sm"></i>
