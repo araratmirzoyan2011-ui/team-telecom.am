@@ -22,7 +22,8 @@ function Faq() {
   const navigate = useNavigate();
 
   const [activeCategory, setActiveCategory] = useState('Mobile');
-  const [openAccordion, setOpenAccordion] = useState(0);
+  // Սկզբնական արժեքը դնում ենք null, որպեսզի ոչ մի հարց բացված չլինի
+  const [openAccordion, setOpenAccordion] = useState(null);
   const [faqData, setFaqData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -94,7 +95,8 @@ function Faq() {
                 key={cat}
                 onClick={() => {
                   setActiveCategory(cat);
-                  setOpenAccordion(0);
+                  // Կատեգորիան փոխելիս նույնպես փակում ենք բոլոր բացված հարցերը
+                  setOpenAccordion(null);
                 }}
                 className={`w-full text-left px-5 py-4 font-medium transition-colors flex justify-between items-center border-b border-gray-100 last:border-none ${
                   activeCategory === cat

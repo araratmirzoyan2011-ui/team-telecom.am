@@ -16,53 +16,29 @@ function DeviceSettings() {
   const [selectedAction, setSelectedAction] = useState('');
   const [selectedDevice, setSelectedDevice] = useState('');
 
-  // Նկարներից դուրս բերված "What to do" ցանկը
-  const whatToDoOptions = [
-    "How configure Internet settings",
-    "How to change the name or password for WiFi",
-    "How to check fixed internet debt?",
-    "How to check the speed of the Internet?",
-    "How to check your Static IP?",
-    "How to configure ADSL / VDSL / FTTB modems?",
-    "How to configure Stbox?",
-    "How to connect STBOX to modem via HDMI and RCA",
-    "How to connect to the beeline SMTP server?",
-    "How to set up Port Forward?",
-    "How to set up STBOX to connect via LAN or WIFI",
-    "How to set up the sequence of channels in the STBOX?"
-  ];
+  const [whatToDoOptions, setWhatToDoOptions] = useState([]);
+  const [deviceModelOptions, setDeviceModelOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Նկարներից դուրս բերված "Device model" ցանկը
-  const deviceModelOptions = [
-    "Router TP-Link TD W8901N",
-    "Router D-Link Dir 300/Dir300A",
-    "Port forward W8901N",
-    "WiFi TP-Link TD W8901N WiFi / TP-Link TD W8901G WiFi",
-    "Micromax",
-    "Beeline Smart",
-    "HTC",
-    "Nokia 8110",
-    "Nokia 3310",
-    "Router D-Link DSL 2500U",
-    "Router TP-Link TD 8817",
-    "WiFi ZTE H108N",
-    "WiFi ZTE H168N",
-    "WiFi D-Link DSL 2640U New",
-    "WiFi D-Link DSL 2640U",
-    "Router D-Link 2640U new",
-    "Router ZTE H108N",
-    "WiFi D-Link DIR 300 / D-Link DIR 300A",
-    "WiFi TP-Link TL-WR840N",
-    "Smart Box One",
-    "Smart Box Turbo+",
-    "Smart Box Pro",
-    "Internet speed",
-    "IP-address",
-    "TP-Link TL-WR842ND",
-    "K1+",
-    "VDSL V100",
-    "WR744+/ Beeline F100"
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const whatToDoSnap = await getDocs(collection(db, "whatToDo"));
+        const whatToDoData = whatToDoSnap.docs.map(doc => doc.data().title);
+        setWhatToDoOptions(whatToDoData);
+
+        const deviceSnap = await getDocs(collection(db, "deviceModels"));
+        const deviceData = deviceSnap.docs.map(doc => doc.data().title);
+        setDeviceModelOptions(deviceData);
+      } catch (error) {
+        console.error("Սխալ Firebase-ից տվյալները կարդալիս:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -74,7 +50,6 @@ function DeviceSettings() {
       {header()}
       {bgimg("https://www.telecomarmenia.am/images/menu/1/16509767646793.png")}
 
-      {/* Top Navigation Cards */}
       <div className="mt-[-50px] h-[120px] bg-white shadow-md rounded-lg flex justify-center items-center w-4/5 ml-[10%] max-[1200px]:w-[90%] max-[1200px]:ml-[5%] max-[900px]:w-[94%] max-[900px]:ml-[3%] z-10 relative">
         <HBorder 
           url="https://www.telecomarmenia.am/files/icons/1/16510715800139/45x45.png" 
@@ -98,14 +73,12 @@ function DeviceSettings() {
         />
       </div>
 
-      {/* Main Content */}
       <div className="w-4/5 mx-auto max-[1200px]:w-[90%] max-[900px]:w-[94%] my-12 relative min-h-[500px]">
         <h1 className="text-3xl sm:text-4xl font-bold text-[#161414] mb-8">
           Device settings
         </h1>
 
         <form onSubmit={handleSearch} className="max-w-4xl relative z-10">
-          {/* Search Bar & Button */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-400">
@@ -133,16 +106,15 @@ function DeviceSettings() {
             Select your question or device model to get the settings
           </p>
 
-          {/* Dropdown Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* What to do Select */}
             <div className="relative">
               <select
                 value={selectedAction}
                 onChange={(e) => setSelectedAction(e.target.value)}
-                className="w-full px-5 py-3.5 bg-[#f8f9fa] border border-gray-200 rounded-xl text-gray-600 appearance-none focus:outline-none focus:border-gray-300 cursor-pointer text-sm"
+                disabled={loading}
+                className="w-full px-5 py-3.5 bg-[#f8f9fa] border border-gray-200 rounded-xl text-gray-600 appearance-none focus:outline-none focus:border-gray-300 cursor-pointer text-sm disabled:opacity-60"
               >
-                <option value="">What to do</option>
+                <option value="">{loading ? "Բեռնվում է..." : "What to do"}</option>
                 {whatToDoOptions.map((item, idx) => (
                   <option key={idx} value={item}>
                     {item}
@@ -154,14 +126,14 @@ function DeviceSettings() {
               </span>
             </div>
 
-            {/* Device model Select */}
             <div className="relative">
               <select
                 value={selectedDevice}
                 onChange={(e) => setSelectedDevice(e.target.value)}
-                className="w-full px-5 py-3.5 bg-[#f8f9fa] border border-gray-200 rounded-xl text-gray-600 appearance-none focus:outline-none focus:border-gray-300 cursor-pointer text-sm"
+                disabled={loading}
+                className="w-full px-5 py-3.5 bg-[#f8f9fa] border border-gray-200 rounded-xl text-gray-600 appearance-none focus:outline-none focus:border-gray-300 cursor-pointer text-sm disabled:opacity-60"
               >
-                <option value="">Device model</option>
+                <option value="">{loading ? "Բեռնվում է..." : "Device model"}</option>
                 {deviceModelOptions.map((item, idx) => (
                   <option key={idx} value={item}>
                     {item}
@@ -175,7 +147,6 @@ function DeviceSettings() {
           </div>
         </form>
 
-        {/* Background Gear Icon SVG */}
         <div className="absolute left-1/2 top-48 -translate-x-1/2 pointer-events-none z-0 opacity-40">
           <svg
             width="320"
