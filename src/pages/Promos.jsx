@@ -9,6 +9,7 @@ import { bgimg } from "../Components/bg.jsx";
 import { HBorder } from '../Components/hborder.jsx';
 import { HBorder2 } from '../Components/hborder2.jsx';
 
+// Տվյալների զանգվածը
 const newsData = [
   {
     id: 1,
@@ -91,40 +92,37 @@ function Promo() {
       {header()}
       {bgimg("https://www.telecomarmenia.am/images/menu/1/16509766969299.png")}
 
-      {/* Top Navigation Bar with Horizontal Scroll for Mobile */}
-      <div className="mt-[-50px] min-h-[120px] py-4 bg-white shadow-xl rounded-2xl flex items-center justify-start lg:justify-center overflow-x-auto px-4 w-[90%] max-w-[1200px] mx-auto z-10 relative scrollbar-none">
-        <div className="flex items-center gap-2 md:gap-4 shrink-0">
-          <HBorder 
-            url="https://www.telecomarmenia.am/file_manager/shake_site/shake_logo.png" 
-            text="Shake and Win!" 
-            onClickHandler={() => navigate('/shake')} 
-          />
-          <HBorder 
-            url="https://www.telecomarmenia.am/files/icons/1/1651070448779/45x45.png" 
-            text="Team Bonus" 
-            onClickHandler={() => navigate('/team-bonus')} 
-          />
-          <HBorder2 
-            url="https://www.telecomarmenia.am/files/icons/1/16510717960323/45x45.png" 
-            text="Promos" 
-            onClickHandler={() => navigate('/promos')} 
-          />
-          <HBorder 
-            url="https://www.telecomarmenia.am/files/icons/1/17865189736438/45x45.png" 
-            text="MobiBattle" 
-            onClickHandler={() => navigate('/mobibattle')} 
-          />
-          <HBorder 
-            url="https://www.telecomarmenia.am/files/icons/1/17865188939861/45x45.png" 
-            text="GeForce Games" 
-            onClickHandler={() => navigate('/geforce-games')} 
-          />
-          <HBorder 
-            url="https://www.telecomarmenia.am/files/icons/1/17865188628767/45x45.png" 
-            text="Koreez" 
-            onClickHandler={() => navigate('/koreez')} 
-          />
-        </div>
+      <div className="mt-[-50px] h-[120px] bg-white shadow-md rounded-lg flex justify-center items-center w-4/5 ml-[10%] max-[1200px]:w-[90%] max-[1200px]:ml-[5%] max-[900px]:w-[94%] max-[900px]:ml-[3%] z-10 relative">
+        <HBorder 
+          url="https://www.telecomarmenia.am/file_manager/shake_site/shake_logo.png" 
+          text="Shake and Win!" 
+          onClickHandler={() => navigate('/shake')} 
+        />
+        <HBorder 
+          url="https://www.telecomarmenia.am/files/icons/1/1651070448779/45x45.png" 
+          text="Team Bonus" 
+          onClickHandler={() => navigate('/team-bonus')} 
+        />
+        <HBorder2 
+          url="https://www.telecomarmenia.am/files/icons/1/16510717960323/45x45.png" 
+          text="Promos" 
+          onClickHandler={() => navigate('/promos')} 
+        />
+        <HBorder 
+          url="https://www.telecomarmenia.am/files/icons/1/17865189736438/45x45.png" 
+          text="MobiBattle" 
+          onClickHandler={() => navigate('/mobibattle')} 
+        />
+        <HBorder 
+          url="https://www.telecomarmenia.am/files/icons/1/17865188939861/45x45.png" 
+          text="GeForce Games" 
+          onClickHandler={() => navigate('/geforce-games')} 
+        />
+        <HBorder 
+          url="https://www.telecomarmenia.am/files/icons/1/17865188628767/45x45.png" 
+          text="Koreez" 
+          onClickHandler={() => navigate('/koreez')} 
+        />
       </div>
 
       <div className="w-[90%] max-w-[1200px] mx-auto">
@@ -132,7 +130,6 @@ function Promo() {
           Promos
         </h1>
 
-        {/* Tabs */}
         <div className="mt-6 border-b border-gray-200 flex gap-6 sm:gap-10 items-center overflow-x-auto">
           {['News', 'Announcements', 'All'].map((tab) => (
             <button
@@ -149,25 +146,22 @@ function Promo() {
           ))}
         </div>
 
-        {/* Filter and Calendar Controls */}
         <div className="mt-8 flex flex-wrap items-center gap-4">
           {kalendar("2026.08.27", "2026.08.27")}
           {border8("Search")}
         </div>
 
-        {/* Grid Container */}
         <div className="my-10">
           {(activeTab === 'News' || activeTab === 'All') && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 w-full">
               {newsData.map((item) => (
                 <div 
                   key={item.id} 
                   className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between cursor-pointer"
                 >
                   <div>
-                    {/* Image Area with zoom effect */}
                     {item.image ? (
-                      <div className="w-full h-52 overflow-hidden relative bg-gray-100">
+                      <div className="w-full h-56 sm:h-64 overflow-hidden relative bg-gray-100">
                         <img 
                           src={item.image} 
                           alt={item.title} 
@@ -185,7 +179,6 @@ function Promo() {
                       </div>
                     )}
 
-                    {/* Content Area */}
                     <div className="p-6">
                       <h3 className="text-lg sm:text-xl font-bold text-[#161414] group-hover:text-[#003B5C] transition-colors leading-snug line-clamp-2">
                         {item.title}
@@ -198,7 +191,6 @@ function Promo() {
                     </div>
                   </div>
 
-                  {/* Card Footer / Action */}
                   <div className="px-6 pb-6 pt-2 flex items-center justify-between border-t border-gray-50 mt-auto">
                     <span className="text-xs font-semibold text-[#52cee2] group-hover:translate-x-1 transition-transform duration-200 flex items-center gap-1">
                       Read more &rarr;
@@ -209,7 +201,6 @@ function Promo() {
             </div>
           )}
 
-          {/* Announcements Tab Content */}
           {activeTab === 'Announcements' && (
             <div className="w-full py-16 flex flex-col items-center justify-center">
               <img 
@@ -224,7 +215,6 @@ function Promo() {
           )}
         </div>
 
-        {/* Share Button Container */}
         <div className="my-10 flex items-center">
           {share()}
         </div>
