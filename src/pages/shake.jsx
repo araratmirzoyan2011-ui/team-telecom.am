@@ -9,9 +9,8 @@ import { N3 } from '../Components/style5.jsx';
 import { Faq } from '../Components/Faq.jsx';
 import { StepTimeline } from '../Components/StepTimeline';
 import { HowToParticipate } from "../Components/Ph3.jsx";
-import { ph as Ph } from '../Components/ph';
 import { N8 } from "../Components/stile8.jsx";
-
+import { Ph } from "./ph3.jsx";
 function Shake() {
 
   const faqLeft = [
@@ -100,17 +99,31 @@ function Shake() {
                     col="text-[#2c3843]"
                 />
             </div>
-            <div>
-                <div className="w-full flex justify-center">
-                    <h1>How to participate?</h1>
-                </div>
-                <div>
+            <div className="w-full flex flex-col items-center gap-12 py-10 bg-[#f4f4f5]">
+      <h1 className="text-3xl font-bold text-[#003B5C] text-center">
+        How to participate?
+      </h1>
 
-                </div>
-                <div>
+      <div className="flex flex-col md:flex-row items-start justify-center gap-8 w-full max-w-5xl px-4">
+        <Ph 
+          src="https://www.telecomarmenia.am/file_manager/new_shake/am.png"
+          text="Register in My Team application"
+          button="Download"
+        />
+        <Ph 
+          src="https://www.telecomarmenia.am/file_manager/icons/logo_icon%20(2).png"
+          text="Open the Shake section"
+        />
+        <Ph 
+          text="Shake and win surprises every day"
+        />
+      </div>
 
-                </div>
-            </div>
+      <Ph 
+        title="Subscribers of other operators also can shake"
+        button="I want!"
+      />
+    </div>
       <Footer />
     </>
   );
