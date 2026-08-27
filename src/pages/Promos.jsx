@@ -18,7 +18,6 @@ function Promo() {
   const [newsList, setNewsList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Firebase-ի "news7" collection-ից տվյալների ներբեռնում
   useEffect(() => {
     const fetchNews7 = async () => {
       try {

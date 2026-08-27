@@ -70,6 +70,7 @@ import Mobibattle2 from "./pages/mobibattle";
 import Card from "./pages/Card";
 import Shake from "./pages/shake";
 import Promo from "./pages/Promos";
+import Faq from "./pages/faq";
 function App() {
   const loadUserData = useCartStore((state) => state.loadUserData);
 
@@ -87,6 +88,7 @@ function App() {
       <div className="content">
         <Routes>
           <Route path="/page1" element={<Main />} />
+          <Route path="/faq" element={<Faq/>} />
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
           <Route path="/Promos" element={<Promo />} />
           <Route path="/Card" element={<Card />} />
