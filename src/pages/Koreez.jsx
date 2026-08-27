@@ -42,7 +42,6 @@ const faqRight = [
 >
   <div className="max-w-7xl w-full mx-auto flex flex-col md:flex-row items-center justify-between gap-8 h-full py-10">
       
-      {/* Ձախ կողմի քարտը */}
       <div 
         className="w-full md:w-[480px] rounded-2xl p-8 md:p-10 text-white flex flex-col justify-between shadow-lg z-10"
         style={{ backgroundColor: "#42728e" }}
@@ -62,8 +61,6 @@ const faqRight = [
           </button>
         </div>
       </div>
-
-      {/* Աջ կողմի նկարը */}
       <div className="flex-1 h-full flex items-center justify-center max-w-[650px]">
         <img 
           src="https://www.telecomarmenia.am/images/sliders_block_slides/1/17733177317883.png" 
