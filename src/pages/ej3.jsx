@@ -96,7 +96,7 @@ function Shop() {
         </div>
         {gic()}
 
-        <div className="mt-[100px] mx-auto w-11/12 max-w-7xl flex flex-row flex-wrap justify-center items-center gap-6">
+        <div className="mt-[100px] mx-auto w-11/12 max-w-7xl flex flex-row flex-wrap justify-center items-center gap-6 mb-[100px]">
   {border6(
     "Corporate Network", "Reliable information exchange system", "Buy",
     "bg-[#96d1db] w-full lg:w-[57%]",

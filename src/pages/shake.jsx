@@ -7,25 +7,32 @@ import { header as Header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
 import { Ph } from "./ph3.jsx";
 import { PromoSection } from "../Components/PromoSection.jsx";
-
+import { N3 } from "../Components/style5.jsx";
 function Shake() {
 
-  // 1-ին բլոկի տվյալները
   const otherOperatorSteps = [
     "Shake every day, accumulate MBs and Team Bonus points",
     "By becoming a TEAM subscriber with your number within the Shake promo, you can activate all accumulated Bonus points and megabytes for a period of 3 days, paying 1 AMD for each MB package won."
   ];
 
-  // 2-րդ բլոկի (Karapp) տվյալները
   const karappSteps = [
     "Win promo code",
     <>
-      Download Karapp <a href="#" className="underline">application</a>
+      Download Karapp <a href="#" className="underline font-medium hover:text-gray-300">application</a>
     </>,
     <>
-      Activate promo code following the <a href="#" className="underline">instruction</a>
+      Activate promo code following the <a href="#" className="underline font-medium hover:text-gray-300">instruction</a>
     </>,
     "Teach yourself by listening to audio recordings of lessons different areas and subjects"
+  ];
+
+  const eshopSteps = [
+    "Copy won promo code",
+    <>
+      Visit <a href="#" className="underline font-medium hover:text-gray-300">Team E-shop</a>, choose product and add it to the cart
+    </>,
+    'Fill in the required information, in the "Enter promo code" field type the promo code and click "Apply" button.',
+    "Chosen product will be discounted accordingly to the applied promo code."
   ];
 
   const bgImageStyle = (url) => ({
@@ -36,7 +43,6 @@ function Shake() {
     <>
       <Header />
       
-      {/* Banner */}
       <div className="w-full mt-[100px] h-[500px] flex items-center justify-between relative px-6 md:px-16 overflow-hidden bg-[#143d49]">
         <svg
           className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
@@ -107,7 +113,6 @@ function Shake() {
         />
       </div>
 
-      {/* Բլոկ 1: Բաց ֆոն, վերնագիրը մեջտեղում */}
       <PromoSection
         bgColor="#f8f9fa"
         textColor="text-[#003B5C]"
@@ -127,7 +132,6 @@ function Shake() {
         />
       </div>
 
-      {/* Բլոկ 2: Karapp promo codes (Մուգ կապույտ, վերնագիրը ձախից) */}
       <PromoSection
         bgColor="#01425f"
         textColor="text-white"
@@ -137,6 +141,47 @@ function Shake() {
         listItems={karappSteps}
       />
 
+      <PromoSection
+        bgColor="#01425f"
+        textColor="text-white"
+        title="E-shop promo codes"
+        centerTitle={false}
+        imageSrc="https://www.telecomarmenia.am/file_manager/new_shake/eshop-promocodes.jpg"
+        listItems={eshopSteps}
+      />
+<N3
+  src='https://www.telecomarmenia.am/images/block_with_text/1/17597349527997.jpeg'
+  h1='TeamPay Promocodes'
+  p='Shake and get a promo code, activate it in the Benefits section of your TeamPay wallet, and receive 1000 AMD to your wallet balance. Details — in the FAQ.'
+  button="More"
+  col="text-[#003b5c]"
+/>
+
+<div className='w-full min-h-[500px] flex items-center justify-center bg-[#e3ddd2]'>
+  <N2
+    src='https://www.telecomarmenia.am/images/block_with_text/1/17458256385955.png'
+    h1='buy.am Promocodes!'
+    p='Shake and get a 1000 AMD discount promo code for purchases on buy.am. More details in the FAQ.'
+    button="More"
+    col="text-[#003b5c]"
+  />
+</div>
+<section className="w-full bg-[#01425F] text-white py-16 px-6 flex flex-col items-center justify-center text-center">
+  <div className="flex flex-col items-center max-w-4xl mx-auto">
+    <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-2">
+      Shake counter
+    </h2>
+    <p className="text-base md:text-lg font-light text-white/90 mb-6">
+      Already shaked
+    </p>
+    <div className="text-5xl md:text-7xl lg:text-[80px] font-extrabold tracking-wider leading-none mb-3">
+      10000000+
+    </div>
+    <p className="text-base md:text-xl font-light text-white/90">
+      Times
+    </p>
+  </div>
+</section>
       <Footer />
     </>
   );

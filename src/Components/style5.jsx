@@ -1,35 +1,35 @@
-export function N3({ src, h1, p, button, col = "text-white" }) {
+export function N3({ src, h1, p, button, col = "text-[#003B5C]", bgColor = "bg-[#F4F5F7]" }) {
   return (
-    <div className="w-full bg-[#024566] py-12 px-6 md:px-16">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+    <div className={`w-full ${bgColor} py-12 md:py-16 px-6 md:px-16 flex justify-center items-center`}>
+      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         
         {/* Ձախ սյունակ - Տեքստեր + Կոճակ */}
-        <div className={`${col} flex flex-col items-center md:items-start text-center md:text-left space-y-6`}>
+        <div className={`${col} flex flex-col items-start text-left space-y-5 pr-0 md:pr-4`}>
           {h1 && (
-            <h1 className="font-sans text-3xl md:text-5xl lg:text-[52px] font-bold leading-tight">
+            <h1 className="text-3xl md:text-5xl lg:text-[52px] font-bold leading-tight tracking-tight text-[#003B5C]">
               {h1}
             </h1>
           )}
 
           {p && (
-            <p className="font-sans text-base md:text-lg lg:text-[20px] text-gray-200">
+            <p className="text-base md:text-lg text-[#003B5C]/80 font-normal leading-relaxed">
               {p}
             </p>
           )}
 
           {button && (
-            <button className="mt-4 bg-[#00A896] hover:bg-[#008f80] text-white font-bold py-3 px-8 rounded-full transition-all cursor-pointer">
+            <button className="mt-2 bg-[#FF4E50] hover:bg-[#e04345] text-white text-base font-semibold py-3 px-10 rounded-full transition-all duration-300 shadow-sm cursor-pointer">
               {button}
             </button>
           )}
         </div>
 
         {/* Աջ սյունակ - Նկար */}
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center md:justify-end items-center">
           <img 
             src={src} 
-            className="w-full max-w-[500px] h-auto object-contain" 
-            alt="Promo" 
+            className="w-full max-w-[550px] h-auto object-contain rounded-xl" 
+            alt={h1 || "Promo"} 
           />
         </div>
 
