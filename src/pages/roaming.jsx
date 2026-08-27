@@ -8,9 +8,11 @@ import Footer from '../Components/footer.jsx';
 import { N3 } from '../Components/style5.jsx';
 import { Faq } from '../Components/Faq.jsx';
 import RoamingCard from '../Components/RoamingCard.jsx'; // Ներմուծում ենք քարտի կոմպոնենտը
-
+import { N1 } from "../Components/style1.jsx";
 function Roaming() {
-
+    const arr2=[ ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/17537347165186.png", "Visit Team e-Shop and choose smartphone any smartphone/smartphones and add to basket."],
+  ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/17537347165413.png", "On order processing stage choose payment type \"By Credit\" and provide required documents."],
+  ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/17537347165633.png", "Our specialist will contact you to process your credit application."],]
     const faqLeft = [
         {
             q: "Activation and Deactivation",
@@ -110,7 +112,9 @@ function Roaming() {
                     </div>
                 </div>
             </div>
-
+                 <div className='w-full h-auto bg-[#083f58] py-8'>
+                     <N1 arr={arr2} h1='How to get online credit (VTB BANK)' />
+                </div>
             <div className='w-full min-h-[500px] flex items-center justify-center bg-[#024566]'>
                 <N2
                     src="https://www.telecomarmenia.am/images/block_with_text/1/17733165160539.png"
