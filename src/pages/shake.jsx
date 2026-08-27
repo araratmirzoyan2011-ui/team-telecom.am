@@ -7,6 +7,7 @@ import { header as Header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
 import { Ph } from "./ph3.jsx";
 import { PromoSection } from "../Components/PromoSection.jsx";
+import { PromoSection2 } from "../Components/PromoSection2.jsx";
 import { N3 } from "../Components/style5.jsx";
 function Shake() {
 
@@ -14,7 +15,14 @@ function Shake() {
     "Shake every day, accumulate MBs and Team Bonus points",
     "By becoming a TEAM subscriber with your number within the Shake promo, you can activate all accumulated Bonus points and megabytes for a period of 3 days, paying 1 AMD for each MB package won."
   ];
-
+  const myTeamData = [
+  "Check balance and package remainings",
+  "Get free detailed bill",
+  "Make fast and safe payments",
+  "Exchange bonus points",
+  "Activate services",
+  "Change tariff plans"
+];
   const karappSteps = [
     "Win promo code",
     <>
@@ -182,6 +190,16 @@ function Shake() {
     </p>
   </div>
 </section>
+<PromoSection2
+  title="My Team"
+  subtitle="With My Team app you can:"
+  listItems={myTeamData}
+  buttonText="Download"
+  imageSrc="https://www.telecomarmenia.am/file_manager/new_shake/shake_app.png"
+  bgColor="bg-[#f4f4f5]"
+  textColor="text-[#003B5C]"
+  imageLeft={true}
+/>
       <Footer />
     </>
   );
