@@ -73,6 +73,7 @@ import Promo from "./pages/Promos";
 import Faq from "./pages/faq";
 import SubService from "./pages/b2c-subscriber-service";
 import DeviceSettings from "./pages/device-settings";
+import Ussd from "./pages/ussd-and-numbers";
 function App() {
   const loadUserData = useCartStore((state) => state.loadUserData);
 
@@ -90,6 +91,7 @@ function App() {
       <div className="content">
         <Routes>
           <Route path="/page1" element={<Main />} />
+          <Route path="/ussd-and-numbers" element={<Ussd/>} />
           <Route path="/faq" element={<Faq/>} />
           <Route path="/b2c-subscriber-service" element={<SubService/>} />
           <Route path="/device-settings" element={<DeviceSettings/>} />
