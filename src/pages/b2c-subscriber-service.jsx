@@ -20,12 +20,12 @@ function SubService() {
                     text="FAQ" 
                     onClickHandler={() => navigate('/faq')} 
                 />
-                <HBorder2 
+                <HBorder
                     url="https://www.telecomarmenia.am/files/icons/1/16510715205036/45x45.png" 
                     text="Device settings" 
                     onClickHandler={() => navigate('/device-settings')} 
                 />
-                <HBorder
+                <HBorder2
                     url="https://www.telecomarmenia.am/files/icons/1/16510717960323/45x45.png" 
                     text="Subscriber service" 
                     onClickHandler={() => navigate('/b2c-subscriber-service')} 

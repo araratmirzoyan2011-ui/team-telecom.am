@@ -71,6 +71,7 @@ import Card from "./pages/Card";
 import Shake from "./pages/shake";
 import Promo from "./pages/Promos";
 import Faq from "./pages/faq";
+import SubService from "./pages/b2c-subscriber-service";
 import DeviceSettings from "./pages/device-settings";
 function App() {
   const loadUserData = useCartStore((state) => state.loadUserData);
@@ -90,6 +91,7 @@ function App() {
         <Routes>
           <Route path="/page1" element={<Main />} />
           <Route path="/faq" element={<Faq/>} />
+          <Route path="/b2c-subscriber-service" element={<SubService/>} />
           <Route path="/device-settings" element={<DeviceSettings/>} />
           <Route path="/Internet-and-Tv" element={<InternetTV />} />
           <Route path="/Promos" element={<Promo />} />
