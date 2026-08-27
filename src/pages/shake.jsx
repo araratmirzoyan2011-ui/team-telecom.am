@@ -9,8 +9,62 @@ import { Ph } from "./ph3.jsx";
 import { PromoSection } from "../Components/PromoSection.jsx";
 import { PromoSection2 } from "../Components/PromoSection2.jsx";
 import { N3 } from "../Components/style5.jsx";
+import { CallToActionSection } from "../Components/MA1.jsx";
+import { Faq } from "../Components/Faq.jsx";
 function Shake() {
+    const faqLeft = [
+  {
+    q: "Who can participate in promotional draw?",
+    a: "Details here..."
+  },
+  {
+    q: "Where i can find terms of the promotional draw?",
+    a: "Details here..."
+  },
+  {
+    q: '"Daran" Promocodes',
+    a: "Details here..."
+  },
+  {
+    q: "Karapp Promocodes",
+    a: "Details here..."
+  },
+  {
+    q: "How often i can participate in promotional draw?",
+    a: "Details here..."
+  },
+  {
+    q: "What is required to participate in the promotional draw?",
+    a: "Details here..."
+  }
+];
 
+const faqRight = [
+  {
+    q: "How to participate in the promotional draw?",
+    a: "Details here..."
+  },
+  {
+    q: "What prizes can i win?",
+    a: "Details here..."
+  },
+  {
+    q: "How to receive my prize?",
+    a: "Details here..."
+  },
+  {
+    q: "How to download My Team application to join the Shake?",
+    a: "Details here..."
+  },
+  {
+    q: "If the phone number is renamed, are the MB preserved?",
+    a: "Details here..."
+  },
+  {
+    q: "buy.am promocode",
+    a: "Details here..."
+  }
+];
   const otherOperatorSteps = [
     "Shake every day, accumulate MBs and Team Bonus points",
     "By becoming a TEAM subscriber with your number within the Shake promo, you can activate all accumulated Bonus points and megabytes for a period of 3 days, paying 1 AMD for each MB package won."
@@ -200,6 +254,12 @@ function Shake() {
   textColor="text-[#003B5C]"
   imageLeft={true}
 />
+<CallToActionSection
+  title="Become TEAM subscriber"
+  subtitle="Buy a new number or join with your own and enjoy all the benefits of TEAM"
+  buttonText="Join"
+/>
+<Faq leftItems={faqLeft} rightItems={faqRight} title='Frequently asked questions' />
       <Footer />
     </>
   );
