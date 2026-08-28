@@ -60,6 +60,23 @@ function Roaming() {
         { id: 5, title: "Roaming package 1 GB", subtitle: "(Russia, Georgia)", price: "500 AMD" }
     ];
 
+    // Internet in Roaming 9 AMD/MB աղյուսակի տվյալները
+    const roaming9Data = [
+        { label: "Internet", value: "9 AMD/MB*" },
+        { label: "Incoming and outgoing calls to Armenia", value: "150 AMD/min" },
+        { label: "Local and International calls", value: "250 AMD/min" },
+        { label: "SMS", value: "25 AMD" }
+    ];
+
+    const roaming9Countries = "*Albania, Andorra, Anguilla, Antigua and Barbuda, Argentina, Australia, Austria, Bahamas, Bangladesh, Barbados, Belarus, Belgium, Bosnia and Herzegovina, Bulgaria, Canada, Cayman Islands, China, Congo, Croatia, Cyprus, Czech Republic, Denmark, Dominica, Egypt, Estonia, Faroe Islands, Fiji, Finland, France, Georgia, Germany, Ghana, Greece, Greenland, Grenada, Iceland, Ireland, Isle of Man, Israel, Italy, Japan, Kazakhstan, Kosovo, Kyrgyzstan, Latvia, Lesotho, Liechtenstein, Lithuania, Luxembourg, Malaysia, Malta, Moldova, Montenegro, Montserrat, Morocco, Mozambique, Myanmar, Netherlands, New Zealand, North Macedonia, Norway, Papua New Guinea, Poland, Portugal, Qatar, Romania, Russia, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland, Taiwan, Tajikistan, Thailand, Tonga, Ukraine, United Kingdom, United States, Uzbekistan, Vanuatu.";
+
+    // Best Tariffs աղյուսակի տվյալները
+    const tariffsData = [
+        { label: "Internet", value: "9 AMD/MB" },
+        { label: "Incoming and outgoing calls to Team* mobile network", value: "29.99 AMD/min" },
+        { label: "Local and International calls", value: "250 AMD/min" }
+    ];
+
     return (
         <>
             <Header />
@@ -132,33 +149,83 @@ function Roaming() {
                 <N1 arr={arr2} h1='More than 140 countries' />
             </div>
 
-            <div className='w-full min-h-[500px] flex items-center justify-center bg-[#024566]'>
-                <N2
-                    src="https://www.telecomarmenia.am/images/block_with_text/1/17733165160539.png"
-                    h1='What is Koreez?'
-                    p='With Koreez, you can master your entire school curriculum through games and competing with friends.'
-                    col="text-white"
-                />
+            {/* Internet in Roaming 9 AMD/MB Section */}
+            <div className="w-full py-16 px-6 md:px-16 bg-white text-gray-800">
+                <div className="max-w-4xl mx-auto text-center">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+                        Internet in Roaming 9 AMD/MB
+                    </h2>
+                    <p className="text-sm text-gray-500 mb-8">
+                        Available destinations and tariffs: <a href="#list" className="text-blue-600 underline">list</a>
+                    </p>
+
+                    <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm mb-6">
+                        {roaming9Data.map((row, index) => (
+                            <div 
+                                key={index} 
+                                className={`flex flex-col md:flex-row justify-between items-center p-4 md:p-5 ${
+                                    index !== roaming9Data.length - 1 ? 'border-b border-gray-200' : ''
+                                } bg-gray-50 hover:bg-gray-100 transition-colors`}
+                            >
+                                <div className="text-left font-medium text-gray-700 w-full md:w-3/4 mb-2 md:mb-0">
+                                    {row.label}
+                                </div>
+                                <div className="text-left md:text-right font-bold text-gray-900 w-full md:w-1/4">
+                                    {row.value}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <p className="text-xs text-gray-400 text-left leading-relaxed">
+                        {roaming9Countries}
+                    </p>
+                </div>
             </div>
 
-            <N3
-                src='https://www.telecomarmenia.am/images/block_with_text/1/17733169461711.png'
-                h1='The Advantages of Koreez'
-                p='Study your lessons based on the national curriculum.
-Play and earn points.
-Compete with friends and become the best .'
-            />
+            {/* Best Tariffs Section */}
+            <div className="w-full py-16 px-6 md:px-16 bg-gray-50 text-gray-800 border-t border-gray-200">
+                <div className="max-w-4xl mx-auto text-center">
+                    <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+                        Best tariffs
+                    </h2>
 
-            <div className='w-full min-h-[500px] flex items-center justify-center bg-[#024566]'>
-                <N2
-                    src="https://www.telecomarmenia.am/images/block_with_text/1/17733183195181.png"
-                    h1='Safe and engaging learning'
-                    p='Koreez helps kids learn with joy, ensuring parents that the educational content is safe and high-quality.'
-                    button="Join"
-                    col="text-white"
-                />
+                    {/* Flags */}
+                    <div className="flex justify-center items-center gap-3 mb-3">
+                        <span className="text-2xl" title="Italy">🇮🇹</span>
+                        <span className="text-2xl" title="Russia">🇷🇺</span>
+                        <span className="text-2xl" title="Georgia">🇬🇪</span>
+                        <span className="text-2xl" title="Ukraine">🇺🇦</span>
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-2">
+                        Italy (Wind), Russia(Beeline), Georgia (Cellfie), Ukraine (Kyivstar)
+                    </p>
+                    <p className="text-sm text-gray-500 mb-8">
+                        Available destinations and tariffs: <a href="#list" className="text-blue-600 underline">list</a>
+                    </p>
+
+                    {/* Table */}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white">
+                        {tariffsData.map((row, index) => (
+                            <div 
+                                key={index} 
+                                className={`flex flex-col md:flex-row justify-between items-center p-4 md:p-5 ${
+                                    index !== tariffsData.length - 1 ? 'border-b border-gray-200' : ''
+                                } hover:bg-gray-50 transition-colors`}
+                            >
+                                <div className="text-left font-medium text-gray-700 w-full md:w-3/4 mb-2 md:mb-0">
+                                    {row.label}
+                                </div>
+                                <div className="text-left md:text-right font-bold text-gray-900 w-full md:w-1/4">
+                                    {row.value}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
-
+            
             <Faq leftItems={faqLeft} rightItems={faqRight} title='FAQ' />
             
             <Footer />
