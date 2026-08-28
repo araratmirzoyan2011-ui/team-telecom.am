@@ -9,6 +9,7 @@ import { N3 } from '../Components/style5.jsx';
 import { Faq } from '../Components/Faq.jsx';
 import RoamingCard from '../Components/RoamingCard.jsx';
 import { N1 } from "../Components/Style111.jsx";
+import { hborder3 } from "../Components/hborder3.jsx";
 
 function Roaming() {
     const arr2 = [
@@ -31,27 +32,18 @@ function Roaming() {
 
     const faqLeft = [
         {
-            q: "Activation and Deactivation",
-            a: "Here you can place instructions regarding activation and deactivation."
-        },
-        {
-            q: "Subscription price",
-            a: "Here you can place details regarding the subscription price."
+            q: "For roaming guests",
+            a: "Here you can place information and instructions for roaming guests."
         }
     ];
 
     const faqRight = [
         {
-            q: "Who can subscribe?",
-            a: "Here you can place information about who is eligible to subscribe."
-        },
-        {
-            q: "How to start using Koreez?",
-            a: "Here you can place instructions on how to start using Koreez."
+            q: "How to recharge balance abroad?",
+            a: "Here you can place instructions on how to recharge your balance while being abroad."
         }
     ];
 
-    // Փաթեթների տվյալները
     const packages = [
         { id: 1, title: "Roaming package", dataValue: "1 GB +", price: "2000 AMD" },
         { id: 2, title: "Roaming package", dataValue: "4 GB", price: "5000 AMD" },
@@ -60,7 +52,6 @@ function Roaming() {
         { id: 5, title: "Roaming package 1 GB", subtitle: "(Russia, Georgia)", price: "500 AMD" }
     ];
 
-    // Internet in Roaming 9 AMD/MB աղյուսակի տվյալները
     const roaming9Data = [
         { label: "Internet", value: "9 AMD/MB*" },
         { label: "Incoming and outgoing calls to Armenia", value: "150 AMD/min" },
@@ -70,7 +61,6 @@ function Roaming() {
 
     const roaming9Countries = "*Albania, Andorra, Anguilla, Antigua and Barbuda, Argentina, Australia, Austria, Bahamas, Bangladesh, Barbados, Belarus, Belgium, Bosnia and Herzegovina, Bulgaria, Canada, Cayman Islands, China, Congo, Croatia, Cyprus, Czech Republic, Denmark, Dominica, Egypt, Estonia, Faroe Islands, Fiji, Finland, France, Georgia, Germany, Ghana, Greece, Greenland, Grenada, Iceland, Ireland, Isle of Man, Israel, Italy, Japan, Kazakhstan, Kosovo, Kyrgyzstan, Latvia, Lesotho, Liechtenstein, Lithuania, Luxembourg, Malaysia, Malta, Moldova, Montenegro, Montserrat, Morocco, Mozambique, Myanmar, Netherlands, New Zealand, North Macedonia, Norway, Papua New Guinea, Poland, Portugal, Qatar, Romania, Russia, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland, Taiwan, Tajikistan, Thailand, Tonga, Ukraine, United Kingdom, United States, Uzbekistan, Vanuatu.";
 
-    // Best Tariffs աղյուսակի տվյալները
     const tariffsData = [
         { label: "Internet", value: "9 AMD/MB" },
         { label: "Incoming and outgoing calls to Team* mobile network", value: "29.99 AMD/min" },
@@ -113,7 +103,7 @@ function Roaming() {
                 </div>
             </div>
 
-            <div className="w-full py-20 px-6 md:px-16  bg-[#024566] text-white">
+            <div className="w-full py-20 px-6 md:px-16 bg-[#024566] text-white">
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-3xl md:text-5xl font-extrabold text-center mb-16 tracking-tight">
                         Internet in roaming
@@ -145,11 +135,10 @@ function Roaming() {
                 </div>
             </div>
 
-            <div className='w-full h-auto bg-[#083f58] py-8'>
-                <N1 arr={arr2} h1='More than 140 countries' />
+            <div className="w-full h-auto bg-[#083f58] py-8">
+                <N1 arr={arr2} h1="More than 140 countries" />
             </div>
 
-            {/* Internet in Roaming 9 AMD/MB Section */}
             <div className="w-full py-16 px-6 md:px-16 bg-white text-gray-800">
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
@@ -183,14 +172,12 @@ function Roaming() {
                 </div>
             </div>
 
-            {/* Best Tariffs Section */}
             <div className="w-full py-16 px-6 md:px-16 bg-gray-50 text-gray-800 border-t border-gray-200">
                 <div className="max-w-4xl mx-auto text-center">
                     <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
                         Best tariffs
                     </h2>
 
-                    {/* Flags */}
                     <div className="flex justify-center items-center gap-3 mb-3">
                         <span className="text-2xl" title="Italy">🇮🇹</span>
                         <span className="text-2xl" title="Russia">🇷🇺</span>
@@ -205,7 +192,6 @@ function Roaming() {
                         Available destinations and tariffs: <a href="#list" className="text-blue-600 underline">list</a>
                     </p>
 
-                    {/* Table */}
                     <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white">
                         {tariffsData.map((row, index) => (
                             <div 
@@ -225,8 +211,21 @@ function Roaming() {
                     </div>
                 </div>
             </div>
-            
-            <Faq leftItems={faqLeft} rightItems={faqRight} title='FAQ' />
+
+            <h1 className="text-[40px] ml-[20%] font-bold text-[rgb(22,20,20)] mt-[60px]">Useful information</h1>
+
+            <div className="w-[80%] mt-[40px] ml-[20%] mb-[150px] grid grid-cols-3 gap-5 max-xl:grid-cols-3 max-[800px]:grid-cols-2 max-[700px]:grid-cols-1">
+                {hborder3(
+                    "Roaming activation terms", 
+                    "Learn more about the terms and conditions required for activating roaming services."
+                )}
+                {hborder3(
+                    "Roaming tariffs at the sea and in the air", 
+                    "Be online even at the sea and in the air"
+                )}
+            </div>
+
+            <Faq leftItems={faqLeft} rightItems={faqRight} title="FAQ" />
             
             <Footer />
         </>
