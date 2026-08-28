@@ -2,70 +2,83 @@ import "../CSS/shared.css";
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { N2 } from '../Components/style2.jsx';
+import { useState, useEffect } from 'react';
 import { header as Header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
-import { N3 } from '../Components/style5.jsx';
 import { Faq } from '../Components/Faq.jsx';
 import RoamingCard from '../Components/RoamingCard.jsx';
 import { N1 } from "../Components/Style111.jsx";
 import { hborder3 } from "../Components/hborder3.jsx";
+import { db } from "../firebase"; 
+import { collection, getDocs } from "firebase/firestore";
 
 function Roaming() {
-    const arr2 = [
-        [
-            "https://www.telecomarmenia.am/images/block_with_icons_icons/1/16511298499299.png", 
-            "Calls", 
-            "From 29,99 AMD/min"
-        ],
-        [
-            "https://www.telecomarmenia.am/images/block_with_icons_icons/1/16511332255945.png", 
-            "Internet", 
-            "From 0.5 AMD/MB"
-        ],
-        [
-            "https://www.telecomarmenia.am/images/block_with_icons_icons/1/17830723331028.png", 
-            "SMS", 
-            "From 25 AMD"
-        ]
-    ];
+    const [packages, setPackages] = useState([]);
+    const [roaming9Data, setRoaming9Data] = useState([]);
+    const [roaming9Countries, setRoaming9Countries] = useState("");
+    const [tariffsData, setTariffsData] = useState([]);
+    const [arr2, setArr2] = useState([]);
+    const [faqLeft, setFaqLeft] = useState([]);
+    const [faqRight, setFaqRight] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const faqLeft = [
-        {
-            q: "For roaming guests",
-            a: "Here you can place information and instructions for roaming guests."
-        }
-    ];
+    useEffect(() => {
+        const fetchRoamingData = async () => {
+            try {
+                const pkgsSnapshot = await getDocs(collection(db, "roaming1"));
+                setPackages(pkgsSnapshot.docs.map(doc => ({ ...doc.data() })));
 
-    const faqRight = [
-        {
-            q: "How to recharge balance abroad?",
-            a: "Here you can place instructions on how to recharge your balance while being abroad."
-        }
-    ];
+                const r2Snapshot = await getDocs(collection(db, "roaming2"));
+                let r9List = [];
+                let countriesStr = "";
+                r2Snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (doc.id === "countries_info") {
+                        countriesStr = data.countries;
+                    } else {
+                        r9List.push(data);
+                    }
+                });
+                setRoaming9Data(r9List);
+                setRoaming9Countries(countriesStr);
 
-    const packages = [
-        { id: 1, title: "Roaming package", dataValue: "1 GB +", price: "2000 AMD" },
-        { id: 2, title: "Roaming package", dataValue: "4 GB", price: "5000 AMD" },
-        { id: 3, title: "Roaming package", dataValue: "10 GB", price: "12000 AMD" },
-        { id: 4, title: "Roaming package", dataValue: "20 GB", price: "20000 AMD" },
-        { id: 5, title: "Roaming package 1 GB", subtitle: "(Russia, Georgia)", price: "500 AMD" }
-    ];
+                const r3Snapshot = await getDocs(collection(db, "roaming3"));
+                let tariffsList = [];
+                let arr2List = [];
+                r3Snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (doc.id.startsWith("tariff_")) {
+                        tariffsList.push(data);
+                    } else if (doc.id.startsWith("arr2_item_")) {
+                        arr2List.push([data.icon, data.type, data.price]);
+                    }
+                });
+                setTariffsData(tariffsList);
+                setArr2(arr2List);
 
-    const roaming9Data = [
-        { label: "Internet", value: "9 AMD/MB*" },
-        { label: "Incoming and outgoing calls to Armenia", value: "150 AMD/min" },
-        { label: "Local and International calls", value: "250 AMD/min" },
-        { label: "SMS", value: "25 AMD" }
-    ];
+                const r4Snapshot = await getDocs(collection(db, "roaming4"));
+                r4Snapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (doc.id === "faqLeft") setFaqLeft(data.data || []);
+                    if (doc.id === "faqRight") setFaqRight(data.data || []);
+                });
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    const roaming9Countries = "*Albania, Andorra, Anguilla, Antigua and Barbuda, Argentina, Australia, Austria, Bahamas, Bangladesh, Barbados, Belarus, Belgium, Bosnia and Herzegovina, Bulgaria, Canada, Cayman Islands, China, Congo, Croatia, Cyprus, Czech Republic, Denmark, Dominica, Egypt, Estonia, Faroe Islands, Fiji, Finland, France, Georgia, Germany, Ghana, Greece, Greenland, Grenada, Iceland, Ireland, Isle of Man, Israel, Italy, Japan, Kazakhstan, Kosovo, Kyrgyzstan, Latvia, Lesotho, Liechtenstein, Lithuania, Luxembourg, Malaysia, Malta, Moldova, Montenegro, Montserrat, Morocco, Mozambique, Myanmar, Netherlands, New Zealand, North Macedonia, Norway, Papua New Guinea, Poland, Portugal, Qatar, Romania, Russia, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland, Taiwan, Tajikistan, Thailand, Tonga, Ukraine, United Kingdom, United States, Uzbekistan, Vanuatu.";
+        fetchRoamingData();
+    }, []);
 
-    const tariffsData = [
-        { label: "Internet", value: "9 AMD/MB" },
-        { label: "Incoming and outgoing calls to Team* mobile network", value: "29.99 AMD/min" },
-        { label: "Local and International calls", value: "250 AMD/min" }
-    ];
+    if (loading) {
+        return (
+            <div className="w-full h-screen flex items-center justify-center text-xl font-semibold">
+                Loading roaming data...
+            </div>
+        );
+    }
 
     return (
         <>
@@ -110,9 +123,9 @@ function Roaming() {
                     </h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                        {packages.slice(0, 3).map((item) => (
+                        {packages.slice(0, 3).map((item, index) => (
                             <RoamingCard 
-                                key={item.id}
+                                key={item.id || index}
                                 title={item.title}
                                 subtitle={item.subtitle}
                                 dataValue={item.dataValue}
@@ -122,9 +135,9 @@ function Roaming() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                        {packages.slice(3, 5).map((item) => (
+                        {packages.slice(3, 5).map((item, index) => (
                             <RoamingCard 
-                                key={item.id}
+                                key={item.id || index}
                                 title={item.title}
                                 subtitle={item.subtitle}
                                 dataValue={item.dataValue}
@@ -135,7 +148,7 @@ function Roaming() {
                 </div>
             </div>
 
-            <div className="w-full h-auto bg-[#083f58] py-8">
+            <div className="w-full h-auto bg-[#024566] py-8">
                 <N1 arr={arr2} h1="More than 140 countries" />
             </div>
 
