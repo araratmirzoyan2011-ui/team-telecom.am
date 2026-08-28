@@ -7,12 +7,28 @@ import { header as Header } from '../Components/header.jsx';
 import Footer from '../Components/footer.jsx';
 import { N3 } from '../Components/style5.jsx';
 import { Faq } from '../Components/Faq.jsx';
-import RoamingCard from '../Components/RoamingCard.jsx'; // Ներմուծում ենք քարտի կոմպոնենտը
-import { N1 } from "../Components/style1.jsx";
+import RoamingCard from '../Components/RoamingCard.jsx';
+import { N1 } from "../Components/Style111.jsx";
+
 function Roaming() {
-    const arr2=[ ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/17537347165186.png", "Visit Team e-Shop and choose smartphone any smartphone/smartphones and add to basket."],
-  ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/17537347165413.png", "On order processing stage choose payment type \"By Credit\" and provide required documents."],
-  ["https://www.telecomarmenia.am/images/block_with_icons_icons/1/17537347165633.png", "Our specialist will contact you to process your credit application."],]
+    const arr2 = [
+        [
+            "https://www.telecomarmenia.am/images/block_with_icons_icons/1/16511298499299.png", 
+            "Calls", 
+            "From 29,99 AMD/min"
+        ],
+        [
+            "https://www.telecomarmenia.am/images/block_with_icons_icons/1/16511332255945.png", 
+            "Internet", 
+            "From 0.5 AMD/MB"
+        ],
+        [
+            "https://www.telecomarmenia.am/images/block_with_icons_icons/1/17830723331028.png", 
+            "SMS", 
+            "From 25 AMD"
+        ]
+    ];
+
     const faqLeft = [
         {
             q: "Activation and Deactivation",
@@ -64,7 +80,6 @@ function Roaming() {
                                 Roaming that moves with you
                             </p>
                         </div>
-
                         <div>
                             <button className="bg-[#ff4e50] text-white text-base font-semibold px-8 py-2.5 rounded-full hover:bg-red-600 transition-all duration-300 shadow-sm">
                                 Map
@@ -81,7 +96,7 @@ function Roaming() {
                 </div>
             </div>
 
-            <div className="w-full py-20 px-6 md:px-16 bg-[#012f45] text-white">
+            <div className="w-full py-20 px-6 md:px-16  bg-[#024566] text-white">
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-3xl md:text-5xl font-extrabold text-center mb-16 tracking-tight">
                         Internet in roaming
@@ -112,9 +127,11 @@ function Roaming() {
                     </div>
                 </div>
             </div>
-                 <div className='w-full h-auto bg-[#083f58] py-8'>
-                     <N1 arr={arr2} h1='How to get online credit (VTB BANK)' />
-                </div>
+
+            <div className='w-full h-auto bg-[#083f58] py-8'>
+                <N1 arr={arr2} h1='More than 140 countries' />
+            </div>
+
             <div className='w-full min-h-[500px] flex items-center justify-center bg-[#024566]'>
                 <N2
                     src="https://www.telecomarmenia.am/images/block_with_text/1/17733165160539.png"
