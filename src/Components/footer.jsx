@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { onAuthStateChanged, getAuth } from "firebase/auth";
 import { auth, db } from "../firebase.js";
+import { useCallManager, CallOverlay } from "./CallManager.jsx";
 import {
   collection,
   addDoc,
@@ -9,11 +10,11 @@ import {
   doc,
   serverTimestamp,
   query,
+  where,
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
 
-// ----------------- Ընդհանուր helper ֆունկցիաներ -----------------
 function getChatId(uid1, uid2) {
   return [uid1, uid2].sort().join("_");
 }
@@ -69,14 +70,30 @@ function Avatar({ name, uid, size = 36 }) {
 
 const MAX_AUDIO_BYTES = 700 * 1024;
 
-// ----------------- Widget-ի համար հարմարեցված Chat -----------------
-function ChatWidget() {
+function ChatWidget({ onStartCall, onJoinGroupCall }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [groupCallParticipants, setGroupCallParticipants] = useState([]);
+
+  // list view state
+  const [activeTab, setActiveTab] = useState("contacts"); // "contacts" | "groups"
   const [users, setUsers] = useState([]);
+  const [groups, setGroups] = useState([]);
+
+  // 1:1 conversation state
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
+
+  // group conversation state
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [groupMessages, setGroupMessages] = useState([]);
+
+  // new group creation state
+  const [newGroupName, setNewGroupName] = useState("");
+  const [selectedMemberIds, setSelectedMemberIds] = useState(new Set());
+  const [creatingGroup, setCreatingGroup] = useState(false);
+
   const [text, setText] = useState("");
-  const [view, setView] = useState("list"); // "list" | "conversation"
+  const [view, setView] = useState("list"); // "list" | "conversation" | "groupConversation" | "newGroup"
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -95,6 +112,7 @@ function ChatWidget() {
     return () => unsubscribeAuth();
   }, [authInst]);
 
+  // contacts
   useEffect(() => {
     if (!currentUser) return;
     const unsubscribe = onSnapshot(collection(db, "info"), (snapshot) => {
@@ -104,6 +122,18 @@ function ChatWidget() {
     return () => unsubscribe();
   }, [currentUser]);
 
+  // groups the user belongs to
+  useEffect(() => {
+    if (!currentUser) return;
+    const q = query(collection(db, "groups"), where("members", "array-contains", currentUser.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setGroups(data);
+    });
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  // 1:1 messages
   useEffect(() => {
     if (!currentUser || !selectedUser) {
       setMessages([]);
@@ -118,31 +148,128 @@ function ChatWidget() {
     return () => unsubscribe();
   }, [currentUser, selectedUser]);
 
+  // group messages
+  useEffect(() => {
+    if (!currentUser || !selectedGroup) {
+      setGroupMessages([]);
+      return;
+    }
+    const q = query(
+      collection(db, "groups", selectedGroup.id, "messages"),
+      orderBy("createdAt", "asc")
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setGroupMessages(data);
+    });
+    return () => unsubscribe();
+  }, [currentUser, selectedGroup]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, groupMessages]);
+
+  // ընթացիկ group-ի call-ի մասնակիցները, որ ցույց տանք "call in progress" banner
+  useEffect(() => {
+    if (!selectedGroup || view !== "groupConversation") {
+      setGroupCallParticipants([]);
+      return;
+    }
+    const unsubscribe = onSnapshot(
+      collection(db, "groups", selectedGroup.id, "callParticipants"),
+      (snapshot) => {
+        setGroupCallParticipants(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      }
+    );
+    return () => unsubscribe();
+  }, [selectedGroup, view]);
 
   const openConversation = (u) => {
     setSelectedUser(u);
     setView("conversation");
   };
 
+  const openGroupConversation = (g) => {
+    setSelectedGroup(g);
+    setView("groupConversation");
+  };
+
   const backToList = () => {
     setView("list");
     setSelectedUser(null);
+    setSelectedGroup(null);
+  };
+
+  const openNewGroup = () => {
+    setNewGroupName("");
+    setSelectedMemberIds(new Set());
+    setView("newGroup");
+  };
+
+  const toggleMember = (uid) => {
+    setSelectedMemberIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(uid)) next.delete(uid);
+      else next.add(uid);
+      return next;
+    });
+  };
+
+  const createGroup = async () => {
+    if (!currentUser) return;
+    if (newGroupName.trim() === "") {
+      alert("Գրիր group-ի անունը");
+      return;
+    }
+    if (selectedMemberIds.size === 0) {
+      alert("Ընտրիր գոնե մեկ մասնակից");
+      return;
+    }
+    setCreatingGroup(true);
+    try {
+      const memberUids = [currentUser.uid, ...Array.from(selectedMemberIds)];
+      const docRef = await addDoc(collection(db, "groups"), {
+        name: newGroupName.trim(),
+        members: memberUids,
+        createdBy: currentUser.uid,
+        createdAt: serverTimestamp(),
+      });
+      setSelectedGroup({ id: docRef.id, name: newGroupName.trim(), members: memberUids });
+      setView("groupConversation");
+    } catch (err) {
+      console.error("Group-ի ստեղծման սխալ:", err);
+      alert("Չհաջողվեց ստեղծել group-ը, փորձիր կրկին");
+    } finally {
+      setCreatingGroup(false);
+    }
   };
 
   const sendMessage = async () => {
-    if (text.trim() === "" || !currentUser || !selectedUser) return;
-    const chatId = getChatId(currentUser.uid, selectedUser.uid);
-    await addDoc(collection(db, "chats", chatId, "messages"), {
-      type: "text",
-      text,
-      senderId: currentUser.uid,
-      senderName: currentUser.displayName || currentUser.email || "Anonymous",
-      createdAt: serverTimestamp(),
-    });
-    setText("");
+    if (text.trim() === "" || !currentUser) return;
+
+    if (view === "groupConversation" && selectedGroup) {
+      await addDoc(collection(db, "groups", selectedGroup.id, "messages"), {
+        type: "text",
+        text,
+        senderId: currentUser.uid,
+        senderName: currentUser.displayName || currentUser.email || "Anonymous",
+        createdAt: serverTimestamp(),
+      });
+      setText("");
+      return;
+    }
+
+    if (view === "conversation" && selectedUser) {
+      const chatId = getChatId(currentUser.uid, selectedUser.uid);
+      await addDoc(collection(db, "chats", chatId, "messages"), {
+        type: "text",
+        text,
+        senderId: currentUser.uid,
+        senderName: currentUser.displayName || currentUser.email || "Anonymous",
+        createdAt: serverTimestamp(),
+      });
+      setText("");
+    }
   };
 
   const startRecording = async () => {
@@ -195,19 +322,34 @@ function ChatWidget() {
   };
 
   const sendVoiceMessage = async (audioBlob, duration) => {
-    if (!currentUser || !selectedUser) return;
+    if (!currentUser) return;
     setIsUploading(true);
     try {
       const audioBase64 = await blobToBase64(audioBlob);
-      const chatId = getChatId(currentUser.uid, selectedUser.uid);
-      await addDoc(collection(db, "chats", chatId, "messages"), {
-        type: "audio",
-        audioData: audioBase64,
-        duration,
-        senderId: currentUser.uid,
-        senderName: currentUser.displayName || currentUser.email || "Anonymous",
-        createdAt: serverTimestamp(),
-      });
+
+      if (view === "groupConversation" && selectedGroup) {
+        await addDoc(collection(db, "groups", selectedGroup.id, "messages"), {
+          type: "audio",
+          audioData: audioBase64,
+          duration,
+          senderId: currentUser.uid,
+          senderName: currentUser.displayName || currentUser.email || "Anonymous",
+          createdAt: serverTimestamp(),
+        });
+        return;
+      }
+
+      if (view === "conversation" && selectedUser) {
+        const chatId = getChatId(currentUser.uid, selectedUser.uid);
+        await addDoc(collection(db, "chats", chatId, "messages"), {
+          type: "audio",
+          audioData: audioBase64,
+          duration,
+          senderId: currentUser.uid,
+          senderName: currentUser.displayName || currentUser.email || "Anonymous",
+          createdAt: serverTimestamp(),
+        });
+      }
     } catch (err) {
       console.error("Ձայնագրության ուղարկման սխալ:", err);
       alert("Չհաջողվեց ուղարկել ձայնագրությունը, փորձիր կրկին");
@@ -216,37 +358,142 @@ function ChatWidget() {
     }
   };
 
+  const renderMessageBubble = (msg, isMine, accentColor) => (
+    <div key={msg.id} className={`mb-3 flex ${isMine ? "justify-end" : "justify-start"}`}>
+      {!isMine && view === "groupConversation" && (
+        <div className="mr-2 mt-1">
+          <Avatar name={msg.senderName} uid={msg.senderId} size={26} />
+        </div>
+      )}
+      <div className={`max-w-[75%] flex flex-col ${isMine ? "items-end" : "items-start"}`}>
+        {!isMine && view === "groupConversation" && (
+          <span className="text-[10px] text-gray-400 mb-0.5 px-1">{msg.senderName}</span>
+        )}
+        {msg.type === "audio" ? (
+          <div
+            className={`rounded-2xl px-2.5 py-2 shadow-sm flex items-center gap-1.5 ${
+              isMine ? `text-white rounded-br-md` : "bg-gray-100 text-gray-800 rounded-bl-md"
+            }`}
+            style={isMine ? { backgroundColor: accentColor } : undefined}
+          >
+            <audio controls src={msg.audioData} className="h-7" style={{ maxWidth: "150px" }} />
+            {msg.duration != null && (
+              <span className="text-[10px] opacity-80 shrink-0">{formatDuration(msg.duration)}</span>
+            )}
+          </div>
+        ) : (
+          <div
+            className={`rounded-2xl px-3 py-2 text-xs leading-relaxed shadow-sm break-words ${
+              isMine ? "text-white rounded-br-md" : "bg-gray-100 text-gray-800 rounded-bl-md"
+            }`}
+            style={isMine ? { backgroundColor: accentColor } : undefined}
+          >
+            {msg.text}
+          </div>
+        )}
+        <span className="text-[10px] text-gray-400 mt-0.5 px-1">{formatTime(msg.createdAt)}</span>
+      </div>
+    </div>
+  );
+
+  const accentColor = view === "groupConversation" ? "#3b6ea5" : "#00a896";
+
   return (
     <div className="w-full h-full flex flex-col bg-white">
       {view === "list" && (
         <>
-          <div className="px-4 py-3 border-b border-gray-100 shrink-0">
-            <h1 className="text-sm font-semibold text-gray-800">Contacts</h1>
-            <p className="text-[11px] text-gray-400">{users.length} users</p>
+          <div className="px-4 pt-3 border-b border-gray-100 shrink-0">
+            <div className="flex items-center justify-between">
+              <h1 className="text-sm font-semibold text-gray-800">Messages</h1>
+              {activeTab === "groups" && (
+                <button
+                  onClick={openNewGroup}
+                  className="text-[11px] font-medium text-white bg-[#3b6ea5] hover:bg-[#325d8a] px-2.5 py-1 rounded-full flex items-center gap-1"
+                >
+                  <span className="text-sm leading-none">+</span> New group
+                </button>
+              )}
+            </div>
+            <div className="flex gap-4 mt-2.5">
+              <button
+                onClick={() => setActiveTab("contacts")}
+                className={`text-xs pb-2 border-b-2 transition-colors ${
+                  activeTab === "contacts"
+                    ? "border-[#00a896] text-[#00a896] font-medium"
+                    : "border-transparent text-gray-400"
+                }`}
+              >
+                Contacts
+              </button>
+              <button
+                onClick={() => setActiveTab("groups")}
+                className={`text-xs pb-2 border-b-2 transition-colors ${
+                  activeTab === "groups"
+                    ? "border-[#3b6ea5] text-[#3b6ea5] font-medium"
+                    : "border-transparent text-gray-400"
+                }`}
+              >
+                Groups
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto min-h-0">
-            {users.length === 0 && (
-              <div className="p-5 text-gray-400 text-xs text-center">Ոչ մի user չկա</div>
+            {activeTab === "contacts" && (
+              <>
+                {users.length === 0 && (
+                  <div className="p-5 text-gray-400 text-xs text-center">Ոչ մի user չկա</div>
+                )}
+                {users.map((u) => (
+                  <div
+                    key={u.id}
+                    onClick={() => openConversation(u)}
+                    className="flex items-center gap-3 px-4 py-2.5 cursor-pointer border-l-2 border-transparent hover:bg-gray-50 transition-colors"
+                  >
+                    <Avatar name={u.name || u.email} uid={u.uid} />
+                    <div className="min-w-0">
+                      <div className="font-medium text-xs text-gray-800 truncate">{u.name || u.email}</div>
+                      <div className="text-[11px] text-gray-400 truncate">{u.email}</div>
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
-            {users.map((u) => (
-              <div
-                key={u.id}
-                onClick={() => openConversation(u)}
-                className="flex items-center gap-3 px-4 py-2.5 cursor-pointer border-l-2 border-transparent hover:bg-gray-50 transition-colors"
-              >
-                <Avatar name={u.name || u.email} uid={u.uid} />
-                <div className="min-w-0">
-                  <div className="font-medium text-xs text-gray-800 truncate">{u.name || u.email}</div>
-                  <div className="text-[11px] text-gray-400 truncate">{u.email}</div>
-                </div>
-              </div>
-            ))}
+
+            {activeTab === "groups" && (
+              <>
+                {groups.length === 0 && (
+                  <div className="p-5 text-gray-400 text-xs text-center">
+                    Դեռ group չկա, սեղմիր «+ New group»՝ ստեղծելու համար
+                  </div>
+                )}
+                {groups.map((g) => (
+                  <div
+                    key={g.id}
+                    onClick={() => openGroupConversation(g)}
+                    className="flex items-center gap-3 px-4 py-2.5 cursor-pointer border-l-2 border-transparent hover:bg-gray-50 transition-colors"
+                  >
+                    <div
+                      className="flex items-center justify-center rounded-full font-semibold text-white shrink-0"
+                      style={{ width: 36, height: 36, fontSize: 14, backgroundColor: "#3b6ea5" }}
+                    >
+                      <i className="fa-solid fa-users text-sm"></i>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-medium text-xs text-gray-800 truncate">{g.name}</div>
+                      <div className="text-[11px] text-gray-400 truncate">
+                        {(g.members || []).length} մասնակից
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </>
       )}
 
-      {view === "conversation" && selectedUser && (
+      {view === "newGroup" && (
         <>
           <div className="flex items-center gap-2 px-3 py-2.5 bg-white border-b border-gray-100 shrink-0">
             <button
@@ -258,50 +505,156 @@ function ChatWidget() {
                 <path d="M15 18l-6-6 6-6" stroke="#083f58" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <Avatar name={selectedUser.name || selectedUser.email} uid={selectedUser.uid} size={30} />
-            <div className="min-w-0">
-              <div className="font-semibold text-xs text-gray-800 truncate">
-                {selectedUser.name || selectedUser.email}
-              </div>
-              <div className="text-[10px] text-gray-400 truncate">{selectedUser.email}</div>
-            </div>
+            <span className="text-xs font-semibold text-gray-800">Ստեղծել group</span>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-3 py-3 min-h-0">
-            {messages.map((msg) => {
-              const isMine = msg.senderId === currentUser?.uid;
+          <div className="px-4 py-3 border-b border-gray-100 shrink-0">
+            <input
+              type="text"
+              placeholder="Group-ի անունը..."
+              className="w-full bg-gray-100 border-none rounded-full px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-[#3b6ea5]"
+              value={newGroupName}
+              onChange={(e) => setNewGroupName(e.target.value)}
+            />
+          </div>
+
+          <div className="px-4 py-2 text-[11px] text-gray-400 shrink-0">
+            Ընտրիր մասնակիցներին ({selectedMemberIds.size} ընտրված)
+          </div>
+
+          <div className="flex-1 overflow-y-auto min-h-0">
+            {users.length === 0 && (
+              <div className="p-5 text-gray-400 text-xs text-center">Ոչ մի user չկա</div>
+            )}
+            {users.map((u) => {
+              const checked = selectedMemberIds.has(u.uid);
               return (
-                <div key={msg.id} className={`mb-3 flex ${isMine ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[75%] flex flex-col ${isMine ? "items-end" : "items-start"}`}>
-                    {msg.type === "audio" ? (
-                      <div
-                        className={`rounded-2xl px-2.5 py-2 shadow-sm flex items-center gap-1.5 ${
-                          isMine
-                            ? "bg-[#00a896] text-white rounded-br-md"
-                            : "bg-gray-100 text-gray-800 rounded-bl-md"
-                        }`}
-                      >
-                        <audio controls src={msg.audioData} className="h-7" style={{ maxWidth: "150px" }} />
-                        {msg.duration != null && (
-                          <span className="text-[10px] opacity-80 shrink-0">{formatDuration(msg.duration)}</span>
-                        )}
-                      </div>
-                    ) : (
-                      <div
-                        className={`rounded-2xl px-3 py-2 text-xs leading-relaxed shadow-sm break-words ${
-                          isMine
-                            ? "bg-[#00a896] text-white rounded-br-md"
-                            : "bg-gray-100 text-gray-800 rounded-bl-md"
-                        }`}
-                      >
-                        {msg.text}
-                      </div>
+                <div
+                  key={u.id}
+                  onClick={() => toggleMember(u.uid)}
+                  className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-gray-50 transition-colors"
+                >
+                  <div
+                    className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
+                      checked ? "bg-[#3b6ea5] border-[#3b6ea5]" : "border-gray-300"
+                    }`}
+                  >
+                    {checked && (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17l-5-5" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     )}
-                    <span className="text-[10px] text-gray-400 mt-0.5 px-1">{formatTime(msg.createdAt)}</span>
+                  </div>
+                  <Avatar name={u.name || u.email} uid={u.uid} size={32} />
+                  <div className="min-w-0">
+                    <div className="font-medium text-xs text-gray-800 truncate">{u.name || u.email}</div>
+                    <div className="text-[11px] text-gray-400 truncate">{u.email}</div>
                   </div>
                 </div>
               );
             })}
+          </div>
+
+          <div className="px-4 py-3 border-t border-gray-100 shrink-0">
+            <button
+              onClick={createGroup}
+              disabled={creatingGroup}
+              className="w-full bg-[#3b6ea5] hover:bg-[#325d8a] text-white text-xs font-medium py-2.5 rounded-full transition-colors disabled:opacity-60"
+            >
+              {creatingGroup ? "Ստեղծվում է..." : "Ստեղծել group"}
+            </button>
+          </div>
+        </>
+      )}
+
+      {(view === "conversation" && selectedUser) || (view === "groupConversation" && selectedGroup) ? (
+        <>
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-white border-b border-gray-100 shrink-0">
+            <button
+              onClick={backToList}
+              aria-label="Back"
+              className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors shrink-0"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18l-6-6 6-6" stroke="#083f58" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {view === "groupConversation" ? (
+              <>
+                <div
+                  className="flex items-center justify-center rounded-full font-semibold text-white shrink-0"
+                  style={{ width: 30, height: 30, fontSize: 12, backgroundColor: "#3b6ea5" }}
+                >
+                  <i className="fa-solid fa-users text-xs"></i>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-xs text-gray-800 truncate">{selectedGroup.name}</div>
+                  <div className="text-[10px] text-gray-400 truncate">
+                    {(selectedGroup.members || []).length} մասնակից
+                  </div>
+                </div>
+                <button
+                  onClick={() => onJoinGroupCall?.(selectedGroup, "audio")}
+                  aria-label="Group audio call"
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors shrink-0 text-[#3b6ea5]"
+                >
+                  <i className="fa-solid fa-phone text-xs"></i>
+                </button>
+                <button
+                  onClick={() => onJoinGroupCall?.(selectedGroup, "video")}
+                  aria-label="Group video call"
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors shrink-0 text-[#3b6ea5]"
+                >
+                  <i className="fa-solid fa-video text-xs"></i>
+                </button>
+              </>
+            ) : (
+              <>
+                <Avatar name={selectedUser.name || selectedUser.email} uid={selectedUser.uid} size={30} />
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold text-xs text-gray-800 truncate">
+                    {selectedUser.name || selectedUser.email}
+                  </div>
+                  <div className="text-[10px] text-gray-400 truncate">{selectedUser.email}</div>
+                </div>
+                <button
+                  onClick={() => onStartCall?.(selectedUser, "audio")}
+                  aria-label="Audio call"
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors shrink-0 text-[#00a896]"
+                >
+                  <i className="fa-solid fa-phone text-xs"></i>
+                </button>
+                <button
+                  onClick={() => onStartCall?.(selectedUser, "video")}
+                  aria-label="Video call"
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors shrink-0 text-[#00a896]"
+                >
+                  <i className="fa-solid fa-video text-xs"></i>
+                </button>
+              </>
+            )}
+          </div>
+
+          {view === "groupConversation" && groupCallParticipants.length > 0 && (
+            <div className="flex items-center justify-between px-3 py-2 bg-[#3b6ea5]/10 border-b border-gray-100 shrink-0">
+              <span className="text-[11px] text-[#3b6ea5] font-medium">
+                <i className="fa-solid fa-circle text-[6px] mr-1 align-middle animate-pulse"></i>
+                Զանգ ընթացքի մեջ է ({groupCallParticipants.length})
+              </span>
+              <button
+                onClick={() => onJoinGroupCall?.(selectedGroup, "video")}
+                className="text-[11px] font-medium text-white bg-[#3b6ea5] hover:bg-[#325d8a] px-2.5 py-1 rounded-full"
+              >
+                Միանալ
+              </button>
+            </div>
+          )}
+
+          <div className="flex-1 overflow-y-auto px-3 py-3 min-h-0">
+            {(view === "groupConversation" ? groupMessages : messages).map((msg) =>
+              renderMessageBubble(msg, msg.senderId === currentUser?.uid, accentColor)
+            )}
             <div ref={messagesEndRef} />
           </div>
 
@@ -334,7 +687,8 @@ function ChatWidget() {
                 <input
                   type="text"
                   placeholder="Write a message..."
-                  className="flex-1 bg-gray-100 border-none rounded-full px-3 py-2 text-xs outline-none focus:ring-1 focus:ring-[#00a896]"
+                  className="flex-1 bg-gray-100 border-none rounded-full px-3 py-2 text-xs outline-none focus:ring-1"
+                  style={{ "--tw-ring-color": accentColor }}
                   value={text}
                   disabled={isUploading}
                   onChange={(e) => setText(e.target.value)}
@@ -357,7 +711,8 @@ function ChatWidget() {
                   onClick={sendMessage}
                   disabled={isUploading}
                   aria-label="Send"
-                  className="w-8 h-8 flex items-center justify-center bg-[#e34234] hover:bg-[#d23528] text-white rounded-full transition-colors shrink-0 disabled:opacity-60"
+                  className="w-8 h-8 flex items-center justify-center text-white rounded-full transition-colors shrink-0 disabled:opacity-60"
+                  style={{ backgroundColor: accentColor }}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                     <path d="M3 20l18-8L3 4v6l12 2-12 2v6z" fill="currentColor" />
@@ -367,7 +722,7 @@ function ChatWidget() {
             )}
           </div>
         </>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -474,12 +829,16 @@ function AdminPanelWidget() {
 export default function Footer() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [showChatWidget, setShowChatWidget] = useState(false);
   const [showAdminWidget, setShowAdminWidget] = useState(false);
+
+  const call = useCallManager(currentUser);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(!!user);
+      setCurrentUser(user);
       if (!user) setIsAdmin(false);
     });
     return () => unsubscribe();
@@ -589,7 +948,7 @@ export default function Footer() {
         </div>
       </footer>
 
-      {/* Chat icon - միշտ erevum e, sakayn sexmelis ete che login-vac, alert */}
+      {/* Chat icon - mek koch ak, chat-i ishum ka Contacts u Groups tab-ery */}
       <button
         onClick={() => {
           if (!isLoggedIn) {
@@ -622,12 +981,13 @@ export default function Footer() {
             </button>
           </div>
           <div className="flex-1 min-h-0 overflow-hidden">
-            <ChatWidget />
+            <ChatWidget onStartCall={call.startCall} onJoinGroupCall={call.joinGroupCall} />
           </div>
         </div>
       )}
 
-      {/* Admin icon - erevum e miayn admin-nerin, footer-um, chat icon-i koxqin */}
+      <CallOverlay call={call} />
+
       {isLoggedIn && isAdmin && (
         <>
           <button
