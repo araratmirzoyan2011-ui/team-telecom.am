@@ -11,20 +11,13 @@ import {
   query,
   where,
   onSnapshot,
+  getDocs,
 } from "firebase/firestore";
 
-// ================= ICE servers =================
-// STUN-ը (Google-ի anվճար) բավարար է local network-ի կամ պարզ NAT-երի համար,
-// բայց production-ում (firebase deploy-ից հետո, տարբեր internet provider-ների
-// user-երի միջև) շատ դեպքերում STUN-ը ԲԱՎԱՐԱՐ ՉԻ, քանի որ որոշ NAT/firewall
-// տեսակներ (symmetric NAT, corporate firewall, որոշ mobile ցանցեր) արգելափակում
-// են peer-to-peer կապը։ Այդ դեպքերում պետք է TURN relay server, օրինակ՝
-// Twilio Network Traversal, Xirsys, Metered.ca (ունի free tier), կամ սեփական
-// coturn սերվեր։ Doldi քո .env ֆայլում (Vite) այս 3 փոփոխականները, և TURN-ը
-// ավտոմատ կմիանա.
-//   VITE_TURN_URL=turn:your-turn-host:3478
-//   VITE_TURN_USERNAME=...
-//   VITE_TURN_CREDENTIAL=...
+function oneToOneChatId(a, b) {
+  return [a, b].sort().join("_");
+}
+
 const ICE_SERVERS = {
   iceServers: [
     { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] },
@@ -44,6 +37,39 @@ function pairKey(a, b) {
   return [a, b].sort().join("_");
 }
 
+// Call-ի ամփոփումը գրում ենք որպես սովորական message, որ chat history-ում erevum lini
+async function logOneToOneCall({ peerUid, currentUser, callType, status, durationSec }) {
+  try {
+    const chatId = oneToOneChatId(currentUser.uid, peerUid);
+    await addDoc(collection(db, "chats", chatId, "messages"), {
+      type: "call",
+      callType, // "audio" | "video"
+      callStatus: status, // "answered" | "declined" | "no_answer"
+      durationSec: durationSec || 0,
+      senderId: currentUser.uid,
+      senderName: currentUser.displayName || currentUser.email || "Anonymous",
+      createdAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.error("Call-ի history գրելու սխալ:", err);
+  }
+}
+
+async function logGroupCallEvent({ groupId, currentUser, callType, status }) {
+  try {
+    await addDoc(collection(db, "groups", groupId, "messages"), {
+      type: "call",
+      callType,
+      callStatus: status, // "started" | "ended"
+      senderId: currentUser.uid,
+      senderName: currentUser.displayName || currentUser.email || "Anonymous",
+      createdAt: serverTimestamp(),
+    });
+  } catch (err) {
+    console.error("Group call-ի history գրելու սխալ:", err);
+  }
+}
+
 // ================= Հիմնական hook-ը =================
 export function useCallManager(currentUser) {
   const [incomingCall, setIncomingCall] = useState(null); // 1:1 զանգող, ringing
@@ -61,6 +87,16 @@ export function useCallManager(currentUser) {
   const groupPeerConnectionsRef = useRef({}); // { uid: RTCPeerConnection }
   const unsubscribersRef = useRef([]);
   const localStreamRef = useRef(null);
+  const activeCallRef = useRef(null);
+  const currentUserRef = useRef(null);
+
+  useEffect(() => {
+    activeCallRef.current = activeCall;
+  }, [activeCall]);
+
+  useEffect(() => {
+    currentUserRef.current = currentUser;
+  }, [currentUser]);
 
   const clearUnsubs = () => {
     unsubscribersRef.current.forEach((u) => u && u());
@@ -72,9 +108,30 @@ export function useCallManager(currentUser) {
     localStreamRef.current = null;
     setLocalStream(null);
   };
+  const cleanup1to1 = useCallback((reason = "ended") => {
+    const call = activeCallRef.current;
+    const user = currentUserRef.current;
 
-  // ---------- 1:1 cleanup ----------
-  const cleanup1to1 = useCallback(() => {
+    if (call && user && call.role === "caller") {
+      let status;
+      let durationSec = 0;
+      if (reason === "declined") {
+        status = "declined";
+      } else if (call.status === "connected") {
+        status = "answered";
+        durationSec = call.connectedAt ? Math.round((Date.now() - call.connectedAt) / 1000) : 0;
+      } else {
+        status = "no_answer";
+      }
+      logOneToOneCall({
+        peerUid: call.peerUid,
+        currentUser: user,
+        callType: call.type,
+        status,
+        durationSec,
+      });
+    }
+
     peerConnectionRef.current?.close();
     peerConnectionRef.current = null;
     setActiveCall(null);
@@ -97,8 +154,6 @@ export function useCallManager(currentUser) {
     setMuted(false);
     setCameraOff(false);
   }, []);
-
-  // ---------- Ականջալուր ringing 1:1 զանգերի համար ----------
   useEffect(() => {
     if (!currentUser) return;
     const q = query(
@@ -147,6 +202,25 @@ export function useCallManager(currentUser) {
           }
         };
 
+        // ICE candidate-ները կարող են Firestore-ից հասնել ԱՌԱՋ, քան pc-ն ունի
+        // remoteDescription (answer-ը դեռ չի եկել) - այդ դեպքում addIceCandidate-ը
+        // ձախողվում է լուռ։ Այդպիսի candidate-ները հերթագրում ենք ու ավելացնում
+        // հենց remoteDescription-ը դրվի (տես flushPendingCandidates ներքևում)։
+        let pendingCandidates = [];
+        const addOrQueueCandidate = (data) => {
+          if (pc.remoteDescription) {
+            pc.addIceCandidate(new RTCIceCandidate(data)).catch(console.error);
+          } else {
+            pendingCandidates.push(data);
+          }
+        };
+        const flushPendingCandidates = () => {
+          pendingCandidates.forEach((data) =>
+            pc.addIceCandidate(new RTCIceCandidate(data)).catch(console.error)
+          );
+          pendingCandidates = [];
+        };
+
         const offer = await pc.createOffer();
         await pc.setLocalDescription(offer);
         await updateDoc(callDocRef, { offer: { type: offer.type, sdp: offer.sdp } });
@@ -165,14 +239,15 @@ export function useCallManager(currentUser) {
           if (!data) return;
           if (data.answer && pc.currentRemoteDescription == null) {
             await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-            setActiveCall((prev) => (prev ? { ...prev, status: "connected" } : prev));
+            flushPendingCandidates();
+            setActiveCall((prev) => (prev ? { ...prev, status: "connected", connectedAt: Date.now() } : prev));
           }
           if (data.status === "declined") {
             alert("Զանգը մերժվեց");
-            cleanup1to1();
+            cleanup1to1("declined");
           }
           if (data.status === "ended") {
-            cleanup1to1();
+            cleanup1to1("ended");
           }
         });
 
@@ -181,7 +256,7 @@ export function useCallManager(currentUser) {
           (snap) => {
             snap.docChanges().forEach((change) => {
               if (change.type === "added") {
-                pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(console.error);
+                addOrQueueCandidate(change.doc.data());
               }
             });
           }
@@ -191,7 +266,7 @@ export function useCallManager(currentUser) {
       } catch (err) {
         console.error("Զանգի սկսելու սխալ:", err);
         alert("Չհաջողվեց սկսել զանգը, ստուգիր camera/microphone-ի permission-ները");
-        cleanup1to1();
+        cleanup1to1("ended");
       }
     },
     [currentUser, cleanup1to1]
@@ -226,13 +301,24 @@ export function useCallManager(currentUser) {
         status: "accepted",
       });
 
-      setActiveCall({ id, peerUid: callerId, peerName: callerName, type, role: "callee", status: "connected" });
+      setActiveCall({
+        id,
+        peerUid: callerId,
+        peerName: callerName,
+        type,
+        role: "callee",
+        status: "connected",
+        connectedAt: Date.now(),
+      });
       setIncomingCall(null);
 
       const unsubDoc = onSnapshot(doc(db, "calls", id), (snap) => {
         const data = snap.data();
-        if (data?.status === "ended") cleanup1to1();
+        if (data?.status === "ended") cleanup1to1("ended");
       });
+      // pc.setRemoteDescription(offer)-ը կատարվել է վերևում, ուստի callerCandidates-ը
+      // հիմա անվտանգ է ուղիղ ավելացնել, բայց ամեն դեպքում buffer-ով ենք անում
+      // consistency-ի համար։
       const unsubCandidates = onSnapshot(collection(db, "calls", id, "callerCandidates"), (snap) => {
         snap.docChanges().forEach((change) => {
           if (change.type === "added") {
@@ -244,7 +330,7 @@ export function useCallManager(currentUser) {
     } catch (err) {
       console.error("Զանգն ընդունելու սխալ:", err);
       alert("Չհաջողվեց ընդունել զանգը, ստուգիր camera/microphone-ի permission-ները");
-      cleanup1to1();
+      cleanup1to1("ended");
     }
   }, [incomingCall, cleanup1to1]);
 
@@ -296,10 +382,28 @@ export function useCallManager(currentUser) {
         if (e.candidate) addDoc(myCandidates, e.candidate.toJSON());
       };
 
+      // Նույն race condition-ը, ինչ 1:1 զանգում. their candidate-ները հասնում
+      // են այն ինքն էլ, մինչև setRemoteDescription-ը կատարվի, ուստի հերթագրում
+      // ենք, եթե remoteDescription-ը դեռ չկա։
+      let pendingCandidates = [];
+      const addOrQueueCandidate = (data) => {
+        if (pc.remoteDescription) {
+          pc.addIceCandidate(new RTCIceCandidate(data)).catch(console.error);
+        } else {
+          pendingCandidates.push(data);
+        }
+      };
+      const flushPendingCandidates = () => {
+        pendingCandidates.forEach((data) =>
+          pc.addIceCandidate(new RTCIceCandidate(data)).catch(console.error)
+        );
+        pendingCandidates = [];
+      };
+
       const unsubTheirCandidates = onSnapshot(theirCandidates, (snap) => {
         snap.docChanges().forEach((change) => {
           if (change.type === "added") {
-            pc.addIceCandidate(new RTCIceCandidate(change.doc.data())).catch(console.error);
+            addOrQueueCandidate(change.doc.data());
           }
         });
       });
@@ -319,6 +423,7 @@ export function useCallManager(currentUser) {
           const data = snap.data();
           if (data?.answer && pc.currentRemoteDescription == null) {
             await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+            flushPendingCandidates();
           }
         });
         unsubscribersRef.current.push(unsubSignal);
@@ -327,6 +432,7 @@ export function useCallManager(currentUser) {
           const data = snap.data();
           if (data?.offer && data.offererUid !== currentUser.uid && pc.currentRemoteDescription == null) {
             await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+            flushPendingCandidates();
             const answer = await pc.createAnswer();
             await pc.setLocalDescription(answer);
             await setDoc(signalDocRef, { answer: { type: answer.type, sdp: answer.sdp } }, { merge: true });
@@ -351,11 +457,22 @@ export function useCallManager(currentUser) {
         groupPeerConnectionsRef.current = {};
         setGroupRemoteStreams({});
 
+        // Ստուգում ենք՝ արդեն կային մասնակիցներ, թե ես եմ առաջինը (call-ը հենց
+        // հիմա է սկսվում) - որ history-ում գրենք "call started" միայն մեկ անգամ։
+        const existingParticipantsSnap = await getDocs(
+          collection(db, "groups", group.id, "callParticipants")
+        );
+        const isFirstToJoin = existingParticipantsSnap.empty;
+
         await setDoc(doc(db, "groups", group.id, "callParticipants", currentUser.uid), {
           name: currentUser.displayName || currentUser.email || "Anonymous",
           type,
           joinedAt: serverTimestamp(),
         });
+
+        if (isFirstToJoin) {
+          logGroupCallEvent({ groupId: group.id, currentUser, callType: type, status: "started" });
+        }
 
         setActiveGroupCall({ groupId: group.id, groupName: group.name, type });
 
@@ -398,6 +515,17 @@ export function useCallManager(currentUser) {
     if (activeGroupCall && currentUser) {
       try {
         await deleteDoc(doc(db, "groups", activeGroupCall.groupId, "callParticipants", currentUser.uid));
+        const remainingSnap = await getDocs(
+          collection(db, "groups", activeGroupCall.groupId, "callParticipants")
+        );
+        if (remainingSnap.empty) {
+          logGroupCallEvent({
+            groupId: activeGroupCall.groupId,
+            currentUser,
+            callType: activeGroupCall.type,
+            status: "ended",
+          });
+        }
       } catch (err) {
         console.error(err);
       }

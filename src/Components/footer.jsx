@@ -48,6 +48,24 @@ function formatDuration(seconds) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function callStatusLabel(msg) {
+  const kind = msg.callType === "video" ? "Video զանգ" : "Զանգ";
+  switch (msg.callStatus) {
+    case "answered":
+      return `${kind} • ${formatDuration(msg.durationSec || 0)}`;
+    case "declined":
+      return `Մերժված ${kind.toLowerCase()}`;
+    case "no_answer":
+      return `Չպատասխանված ${kind.toLowerCase()}`;
+    case "started":
+      return `${kind} սկսվեց`;
+    case "ended":
+      return `${kind} ավարտվեց`;
+    default:
+      return kind;
+  }
+}
+
 function blobToBase64(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -358,7 +376,21 @@ function ChatWidget({ onStartCall, onJoinGroupCall }) {
     }
   };
 
-  const renderMessageBubble = (msg, isMine, accentColor) => (
+  const renderMessageBubble = (msg, isMine, accentColor) => {
+    if (msg.type === "call") {
+      return (
+        <div key={msg.id} className="w-full flex justify-center my-2">
+          <div className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+            <i className={`fa-solid ${msg.callType === "video" ? "fa-video" : "fa-phone"}`}></i>
+            <span>{callStatusLabel(msg)}</span>
+            <span className="text-gray-300">•</span>
+            <span className="text-gray-400">{formatTime(msg.createdAt)}</span>
+          </div>
+        </div>
+      );
+    }
+
+    return (
     <div key={msg.id} className={`mb-3 flex ${isMine ? "justify-end" : "justify-start"}`}>
       {!isMine && view === "groupConversation" && (
         <div className="mr-2 mt-1">
@@ -394,7 +426,8 @@ function ChatWidget({ onStartCall, onJoinGroupCall }) {
         <span className="text-[10px] text-gray-400 mt-0.5 px-1">{formatTime(msg.createdAt)}</span>
       </div>
     </div>
-  );
+    );
+  };
 
   const accentColor = view === "groupConversation" ? "#3b6ea5" : "#00a896";
 
