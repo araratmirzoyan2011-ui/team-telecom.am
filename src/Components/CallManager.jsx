@@ -37,14 +37,13 @@ function pairKey(a, b) {
   return [a, b].sort().join("_");
 }
 
-// Call-ի ամփոփումը գրում ենք որպես սովորական message, որ chat history-ում erevum lini
 async function logOneToOneCall({ peerUid, currentUser, callType, status, durationSec }) {
   try {
     const chatId = oneToOneChatId(currentUser.uid, peerUid);
     await addDoc(collection(db, "chats", chatId, "messages"), {
       type: "call",
-      callType, // "audio" | "video"
-      callStatus: status, // "answered" | "declined" | "no_answer"
+      callType,
+      callStatus: status, 
       durationSec: durationSec || 0,
       senderId: currentUser.uid,
       senderName: currentUser.displayName || currentUser.email || "Anonymous",
@@ -60,7 +59,7 @@ async function logGroupCallEvent({ groupId, currentUser, callType, status }) {
     await addDoc(collection(db, "groups", groupId, "messages"), {
       type: "call",
       callType,
-      callStatus: status, // "started" | "ended"
+      callStatus: status, 
       senderId: currentUser.uid,
       senderName: currentUser.displayName || currentUser.email || "Anonymous",
       createdAt: serverTimestamp(),
@@ -70,7 +69,6 @@ async function logGroupCallEvent({ groupId, currentUser, callType, status }) {
   }
 }
 
-// ================= Հիմնական hook-ը =================
 export function useCallManager(currentUser) {
   const [incomingCall, setIncomingCall] = useState(null); // 1:1 զանգող, ringing
   const [activeCall, setActiveCall] = useState(null); // 1:1 ընթացիկ զանգ
@@ -170,7 +168,6 @@ export function useCallManager(currentUser) {
     return () => unsub();
   }, [currentUser, activeCall, activeGroupCall]);
 
-  // ================= 1:1 CALL =================
   const startCall = useCallback(
     async (calleeUser, type) => {
       if (!currentUser) return;

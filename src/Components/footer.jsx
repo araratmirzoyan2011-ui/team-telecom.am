@@ -13,6 +13,7 @@ import {
   where,
   orderBy,
   onSnapshot,
+  limit,
 } from "firebase/firestore";
 
 function getChatId(uid1, uid2) {
@@ -88,7 +89,7 @@ function Avatar({ name, uid, size = 36 }) {
 
 const MAX_AUDIO_BYTES = 700 * 1024;
 
-function ChatWidget({ onStartCall, onJoinGroupCall }) {
+function ChatWidget({ onStartCall, onJoinGroupCall, jumpTarget }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [groupCallParticipants, setGroupCallParticipants] = useState([]);
 
@@ -211,6 +212,25 @@ function ChatWidget({ onStartCall, onJoinGroupCall }) {
     setSelectedGroup(g);
     setView("groupConversation");
   };
+
+  // Notification-i vray sexmelis, ughakiv bacvum e handzn chat/group-@
+  const appliedJumpTokenRef = useRef(null);
+  useEffect(() => {
+    if (!jumpTarget || jumpTarget.token === appliedJumpTokenRef.current) return;
+    if (jumpTarget.type === "user") {
+      const u = users.find((x) => x.uid === jumpTarget.id);
+      if (u) {
+        openConversation(u);
+        appliedJumpTokenRef.current = jumpTarget.token;
+      }
+    } else if (jumpTarget.type === "group") {
+      const g = groups.find((x) => x.id === jumpTarget.id);
+      if (g) {
+        openGroupConversation(g);
+        appliedJumpTokenRef.current = jumpTarget.token;
+      }
+    }
+  }, [jumpTarget, users, groups]);
 
   const backToList = () => {
     setView("list");
@@ -376,6 +396,25 @@ function ChatWidget({ onStartCall, onJoinGroupCall }) {
     }
   };
 
+  const deleteMessage = async (msg) => {
+    if (!currentUser || msg.senderId !== currentUser.uid) return; // mionak sepakan message-@ karas jnjel
+    const confirmed = window.confirm("Ջնջե՞լ այս հաղորդագրությունը։ Այս գործողությունը հնարավոր չէ հետարկել։");
+    if (!confirmed) return;
+    try {
+      if (view === "groupConversation" && selectedGroup) {
+        await deleteDoc(doc(db, "groups", selectedGroup.id, "messages", msg.id));
+        return;
+      }
+      if (view === "conversation" && selectedUser) {
+        const chatId = getChatId(currentUser.uid, selectedUser.uid);
+        await deleteDoc(doc(db, "chats", chatId, "messages", msg.id));
+      }
+    } catch (err) {
+      console.error("Message-ի ջնջման սխալ:", err);
+      alert("Չհաջողվեց ջնջել հաղորդագրությունը, փորձիր կրկին");
+    }
+  };
+
   const renderMessageBubble = (msg, isMine, accentColor) => {
     if (msg.type === "call") {
       return (
@@ -423,7 +462,26 @@ function ChatWidget({ onStartCall, onJoinGroupCall }) {
             {msg.text}
           </div>
         )}
-        <span className="text-[10px] text-gray-400 mt-0.5 px-1">{formatTime(msg.createdAt)}</span>
+        <div className="flex items-center gap-1 mt-0.5 px-1">
+          <span className="text-[10px] text-gray-400">{formatTime(msg.createdAt)}</span>
+          {isMine && (
+            <button
+              onClick={() => deleteMessage(msg)}
+              aria-label="Delete message"
+              className="text-gray-300 hover:text-red-500 transition-colors"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0l-1 14a2 2 0 01-2 2H7a2 2 0 01-2-2L4 6h16z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
     </div>
     );
@@ -866,6 +924,47 @@ export default function Footer() {
   const [showChatWidget, setShowChatWidget] = useState(false);
   const [showAdminWidget, setShowAdminWidget] = useState(false);
 
+  // ---- Nor message-neri notification-neri related state ----
+  // amen notification = { key, type: "user"|"group", uid, groupId, name, groupName, preview, time, count }
+  const [notifications, setNotifications] = useState([]);
+  const [myGroups, setMyGroups] = useState([]); // [{id, name}]
+  const [contactUids, setContactUids] = useState([]);
+  const [jumpTarget, setJumpTarget] = useState(null); // konkret chat/group@ bacelu hamar
+  const audioCtxRef = useRef(null);
+  const showChatWidgetRef = useRef(false);
+
+  const unreadTotal = notifications.reduce((sum, n) => sum + n.count, 0);
+
+  const addNotification = (entry) => {
+    setNotifications((prev) => {
+      const idx = prev.findIndex((n) => n.key === entry.key);
+      if (idx !== -1) {
+        const updated = [...prev];
+        const existing = updated[idx];
+        updated.splice(idx, 1);
+        return [{ ...existing, preview: entry.preview, time: entry.time, count: existing.count + 1 }, ...updated];
+      }
+      return [{ ...entry, count: 1 }, ...prev].slice(0, 20);
+    });
+  };
+
+  const dismissNotification = (key) => {
+    setNotifications((prev) => prev.filter((n) => n.key !== key));
+  };
+
+  const clearAllNotifications = () => setNotifications([]);
+
+  const handleNotificationClick = (n) => {
+    setJumpTarget(
+      n.type === "user"
+        ? { type: "user", id: n.uid, token: Date.now() }
+        : { type: "group", id: n.groupId, token: Date.now() }
+    );
+    setShowChatWidget(true);
+    setShowAdminWidget(false);
+    dismissNotification(n.key);
+  };
+
   const call = useCallManager(currentUser);
 
   useEffect(() => {
@@ -887,6 +986,133 @@ export default function Footer() {
     });
     return () => unsubscribe();
   }, [isLoggedIn]);
+
+  // showChatWidget-ի "vercin" arjeqy ref-i mej pahel, vor listener closure-y hin stateov chaishi
+  useEffect(() => {
+    showChatWidgetRef.current = showChatWidget;
+  }, [showChatWidget]);
+
+  // Notification dzayn (AudioContext-ov, ansephakan fayl chi petq)
+  const playNotificationSound = () => {
+    try {
+      const ctx =
+        audioCtxRef.current ||
+        (audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)());
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(880, ctx.currentTime);
+      g.gain.setValueAtTime(0.15, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start();
+      o.stop(ctx.currentTime + 0.3);
+    } catch (e) {
+      console.error("Sound error:", e);
+    }
+  };
+
+  // user-i andamakcuac group-neri id-@ u anun@, vor imanank group message-nery et pahin
+  useEffect(() => {
+    if (!isLoggedIn || !currentUser) return;
+    const q = query(collection(db, "groups"), where("members", "array-contains", currentUser.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setMyGroups(snapshot.docs.map((d) => ({ id: d.id, name: d.data().name || "Group" })));
+    });
+    return () => unsubscribe();
+  }, [isLoggedIn, currentUser]);
+
+  // bolor kontaktneri uid-nery (1:1 chat-neri hamar), vor imanank irenc chatId-nery
+  useEffect(() => {
+    if (!isLoggedIn || !currentUser) return;
+    const unsubscribe = onSnapshot(collection(db, "info"), (snapshot) => {
+      const uids = snapshot.docs
+        .map((d) => d.data().uid)
+        .filter((uid) => uid && uid !== currentUser.uid);
+      setContactUids(uids);
+    });
+    return () => unsubscribe();
+  }, [isLoggedIn, currentUser]);
+
+  // Amen chat-i u amen group-i hamar arandzin listener (voch te collectionGroup,
+  // vorovhetev membership-based rules-y chi tuyl talis "list" tipi collectionGroup query,
+  // mionak konkret path-ov query-nery)
+  useEffect(() => {
+    if (!isLoggedIn || !currentUser) return;
+
+    const mountTime = Date.now();
+    const unsubscribers = [];
+
+    const previewOf = (msg) => {
+      if (msg.type === "audio") return "🎤 Ձայնային հաղորդագրություն";
+      return msg.text || "";
+    };
+
+    // 1:1 chat-neri listener-ner
+    contactUids.forEach((uid) => {
+      const chatId = getChatId(currentUser.uid, uid);
+      const q = query(collection(db, "chats", chatId, "messages"), orderBy("createdAt", "desc"), limit(1));
+      const unsub = onSnapshot(
+        q,
+        (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type !== "added" || change.doc.metadata.hasPendingWrites) return;
+            const msg = change.doc.data();
+            if (msg.senderId === currentUser.uid) return; // im grac message chi hashvum
+            const msgTime = msg.createdAt?.toMillis ? msg.createdAt.toMillis() : Date.now();
+            if (msgTime < mountTime) return; // hin message-nery chenq hashvum
+            if (showChatWidgetRef.current) return; // chat-y bac e, notification chi petq
+
+            addNotification({
+              key: `user_${uid}`,
+              type: "user",
+              uid,
+              name: msg.senderName || "Օգտատեր",
+              preview: previewOf(msg),
+              time: msgTime,
+            });
+            playNotificationSound();
+          });
+        },
+        (err) => console.error("Chat listener sxal:", err)
+      );
+      unsubscribers.push(unsub);
+    });
+
+    // group-neri listener-ner
+    myGroups.forEach((g) => {
+      const q = query(collection(db, "groups", g.id, "messages"), orderBy("createdAt", "desc"), limit(1));
+      const unsub = onSnapshot(
+        q,
+        (snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type !== "added" || change.doc.metadata.hasPendingWrites) return;
+            const msg = change.doc.data();
+            if (msg.senderId === currentUser.uid) return; // im grac message chi hashvum
+            const msgTime = msg.createdAt?.toMillis ? msg.createdAt.toMillis() : Date.now();
+            if (msgTime < mountTime) return; // hin message-nery chenq hashvum
+            if (showChatWidgetRef.current) return; // chat-y bac e, notification chi petq
+
+            addNotification({
+              key: `group_${g.id}`,
+              type: "group",
+              groupId: g.id,
+              groupName: g.name,
+              name: msg.senderName || "Օգտատեր",
+              preview: previewOf(msg),
+              time: msgTime,
+            });
+            playNotificationSound();
+          });
+        },
+        (err) => console.error("Group listener sxal:", err)
+      );
+      unsubscribers.push(unsub);
+    });
+
+    return () => unsubscribers.forEach((unsub) => unsub());
+  }, [isLoggedIn, currentUser, contactUids, myGroups]);
 
   return (
     <>
@@ -988,7 +1214,14 @@ export default function Footer() {
             alert("Չաթը բացելու համար անհրաժեշտ է գրանցվել/մուտք գործել");
             return;
           }
-          setShowChatWidget((prev) => !prev);
+          setShowChatWidget((prev) => {
+            const next = !prev;
+            if (next) {
+              clearAllNotifications();
+              setJumpTarget(null);
+            }
+            return next;
+          });
           setShowAdminWidget(false);
         }}
         aria-label="Open chat"
@@ -997,9 +1230,82 @@ export default function Footer() {
         {showChatWidget ? (
           <span className="text-xl leading-none">✕</span>
         ) : (
-          <i className="fa-regular fa-comment"></i>
+          <>
+            <i className="fa-regular fa-comment"></i>
+            {unreadTotal > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 flex items-center justify-center bg-[#e34234] text-white text-[10px] font-bold rounded-full border-2 border-white">
+                {unreadTotal > 9 ? "9+" : unreadTotal}
+              </span>
+            )}
+          </>
         )}
       </button>
+
+      {/* Notification popover - cuyc e talis KONKRET um-@ grel e, u tuyl e talis jnjel amen meky arandzin */}
+      {isLoggedIn && !showChatWidget && notifications.length > 0 && (
+        <div className="fixed bottom-24 right-6 z-50 w-[320px] max-w-[90vw] max-h-[400px] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-[#083f58] text-white shrink-0">
+            <span className="text-xs font-semibold">Նոր հաղորդագրություններ</span>
+            <button
+              onClick={clearAllNotifications}
+              className="text-[10px] text-white/80 hover:text-white underline shrink-0"
+            >
+              Մաքրել բոլորը
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
+            {notifications.map((n) => (
+              <div
+                key={n.key}
+                onClick={() => handleNotificationClick(n)}
+                className="flex items-start gap-2 px-3 py-2.5 hover:bg-gray-50 cursor-pointer"
+              >
+                {n.type === "group" ? (
+                  <div
+                    className="flex items-center justify-center rounded-full font-semibold text-white shrink-0"
+                    style={{ width: 32, height: 32, fontSize: 12, backgroundColor: "#3b6ea5" }}
+                  >
+                    <i className="fa-solid fa-users text-xs"></i>
+                  </div>
+                ) : (
+                  <div
+                    className="flex items-center justify-center rounded-full font-semibold text-white shrink-0"
+                    style={{ width: 32, height: 32, fontSize: 12, backgroundColor: getAvatarColor(n.uid) }}
+                  >
+                    {getInitials(n.name)}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="text-xs font-medium text-gray-800 truncate">
+                      {n.type === "group" ? n.groupName : n.name}
+                    </span>
+                    {n.count > 1 && (
+                      <span className="text-[9px] font-bold text-white bg-[#e34234] rounded-full px-1.5 py-0.5 shrink-0">
+                        {n.count}
+                      </span>
+                    )}
+                  </div>
+                  {n.type === "group" && (
+                    <span className="text-[10px] text-gray-400 truncate block">{n.name} ✍️</span>
+                  )}
+                  <span className="text-[11px] text-gray-500 truncate block">{n.preview}</span>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    dismissNotification(n.key);
+                  }}
+                  aria-label="Dismiss notification"
+                  className="shrink-0 w-5 h-5 flex items-center justify-center text-gray-300 hover:text-gray-500 rounded-full transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {isLoggedIn && showChatWidget && (
         <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[92vw] h-[560px] max-h-[75vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100">
@@ -1014,7 +1320,7 @@ export default function Footer() {
             </button>
           </div>
           <div className="flex-1 min-h-0 overflow-hidden">
-            <ChatWidget onStartCall={call.startCall} onJoinGroupCall={call.joinGroupCall} />
+            <ChatWidget onStartCall={call.startCall} onJoinGroupCall={call.joinGroupCall} jumpTarget={jumpTarget} />
           </div>
         </div>
       )}
