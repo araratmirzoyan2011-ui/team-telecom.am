@@ -967,6 +967,22 @@ export default function Footer() {
 
   const call = useCallManager(currentUser);
 
+  // Kayq mtnelu handzn microphone u camera-i tuyltvutyun@ harcnel, vor
+  // chat-i mej hetagayum record/call anelu jamanak arden permission-@ lini stacac
+  useEffect(() => {
+    if (!navigator.mediaDevices?.getUserMedia) return;
+    navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true })
+      .then((stream) => {
+        // mez petq e mionak permission-@, voch te aktiv stream, uti anmijapes kangnecnum enq
+        stream.getTracks().forEach((track) => track.stop());
+      })
+      .catch((err) => {
+        // user-@ mersel e kam sarq chuni, sxal chenq cuyc talis, ughakiv log
+        console.warn("Microphone/camera permission-i sxal:", err);
+      });
+  }, []);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setIsLoggedIn(!!user);
