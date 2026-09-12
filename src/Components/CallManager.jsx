@@ -576,13 +576,72 @@ export function useCallManager(currentUser) {
 }
 
 // ================= Video tile (local/remote stream-ը կապում է <video>-ին) =================
+//
+// Bug-ի fix. MediaStream-ի mej video track-y karox e avelacvel AUDIO track-its heto,
+// bayc pc.ontrack-y HER angam@ pass anum e NuYN MediaStream object-y (e.streams[0]) -
+// uti React-y state update-y "identical reference" hamarum e u re-render chi anum,
+// isk hasVideo-y mnum e stale false, texy video-y erbekh chi cuyc talis, herti hascac
+// linelov handerz. Nuynpes track.enabled-y popoxelis (toggleCamera) stream-i reference-y
+// chi popoxvum, uti UI-y chi tehsni popoxutyun@.
+//
+// Fix. VideoTile-y himav hasVideo-y pahum e sepakan state-um u lsum e MediaStream-i
+// "addtrack"/"removetrack" event-nery, isk yurakanchyur track-i "mute"/"unmute"/"ended"
+// event-nery, vor hima nranq real jamanakov force anen re-render.
 function VideoTile({ stream, muted = false, label, size = "large" }) {
   const videoRef = useRef(null);
-  useEffect(() => {
-    if (videoRef.current) videoRef.current.srcObject = stream || null;
-  }, [stream]);
+  const [hasVideo, setHasVideo] = useState(false);
 
-  const hasVideo = stream?.getVideoTracks().some((t) => t.enabled);
+  useEffect(() => {
+    const el = videoRef.current;
+    if (el) {
+      el.srcObject = stream || null;
+      if (stream) {
+        // Ognagorcum enq bratic play() anel, vor Safari-i pes browser-ner,
+        // vory chen "autoplay"-y karkacnal component mount-i vray, sarqvi
+        // hnaravorutyan depqum sarqvi
+        const playPromise = el.play();
+        if (playPromise?.catch) playPromise.catch(() => {});
+      }
+    }
+
+    if (!stream) {
+      setHasVideo(false);
+      return;
+    }
+
+    const recompute = () => {
+      setHasVideo(stream.getVideoTracks().some((t) => t.enabled && t.readyState === "live"));
+    };
+    recompute();
+
+    const trackListeners = [];
+    const attachTrackListeners = (track) => {
+      track.addEventListener("mute", recompute);
+      track.addEventListener("unmute", recompute);
+      track.addEventListener("ended", recompute);
+      trackListeners.push(track);
+    };
+    stream.getTracks().forEach(attachTrackListeners);
+
+    const handleAddTrack = (e) => {
+      attachTrackListeners(e.track);
+      recompute();
+    };
+    const handleRemoveTrack = () => recompute();
+
+    stream.addEventListener("addtrack", handleAddTrack);
+    stream.addEventListener("removetrack", handleRemoveTrack);
+
+    return () => {
+      stream.removeEventListener("addtrack", handleAddTrack);
+      stream.removeEventListener("removetrack", handleRemoveTrack);
+      trackListeners.forEach((track) => {
+        track.removeEventListener("mute", recompute);
+        track.removeEventListener("unmute", recompute);
+        track.removeEventListener("ended", recompute);
+      });
+    };
+  }, [stream]);
 
   return (
     <div
@@ -594,7 +653,21 @@ function VideoTile({ stream, muted = false, label, size = "large" }) {
         <video ref={videoRef} autoPlay playsInline muted={muted} className="w-full h-full object-cover" />
       ) : (
         <>
-          <video ref={videoRef} autoPlay playsInline muted={muted} className="hidden" />
+          {/*
+            Chi karox enq "hidden" (display:none) class-y ognagorcel ayստeg, vorovhetev
+            Safari/WebKit-y (iOS-i bolor browser-nery) pause/suspend en anum media
+            element-nery vorery display:none en - dra hamar audio-only zangi jamanak
+            dzayny lsvats chi lini. Anti tex@ "tesanelu chapov" tex e hatkacnum, bayc
+            popokhelov ayn tesanelutyunic durs (opacity:0 + 1px chap), vor audio-y
+            sharunakum e decode-vel u hnchel.
+          */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted={muted}
+            className="absolute w-px h-px opacity-0 pointer-events-none"
+          />
           <div className="w-12 h-12 rounded-full bg-[#3b6ea5] flex items-center justify-center text-white text-lg font-semibold">
             {label ? label.slice(0, 2).toUpperCase() : "?"}
           </div>
@@ -610,7 +683,7 @@ function VideoTile({ stream, muted = false, label, size = "large" }) {
 }
 
 // ================= Overlay UI =================
-export function CallOverlay({ call }) {
+export function CallOverlay({ call = {} }) {
   const {
     incomingCall,
     activeCall,
