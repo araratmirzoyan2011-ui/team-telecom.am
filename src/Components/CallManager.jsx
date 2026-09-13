@@ -14,8 +14,54 @@ import {
   getDocs,
 } from "firebase/firestore";
 
+// Flip to true while debugging to get per-track/per-connection console logs.
+const DEBUG_CALLS = false;
+
+// ---------------------------------------------------------------------------
+// Small utilities
+// ---------------------------------------------------------------------------
+
 function oneToOneChatId(a, b) {
   return [a, b].sort().join("_");
+}
+
+function pairKey(a, b) {
+  return [a, b].sort().join("_");
+}
+
+function formatDuration(totalSec) {
+  const m = Math.floor(totalSec / 60).toString().padStart(2, "0");
+  const s = Math.floor(totalSec % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+// How many grid columns to use for the group-call view, based on how many
+// tiles need to fit (including yourself).
+function gridColsClass(count) {
+  if (count <= 1) return "grid-cols-1";
+  if (count <= 4) return "grid-cols-2";
+  if (count <= 9) return "grid-cols-3";
+  return "grid-cols-4";
+}
+
+// Turns a getUserMedia() DOMException into a message someone can actually
+// act on, instead of a generic "check permissions" alert.
+function mediaErrorMessage(err) {
+  switch (err?.name) {
+    case "NotAllowedError":
+    case "PermissionDeniedError":
+      return "Camera/microphone-ի հասանելիությունը արգելափակված է։ Թույլատրիր browser-ի կարգավորումներում։";
+    case "NotFoundError":
+    case "DevicesNotFoundError":
+      return "Camera կամ microphone չի գտնվել այս սարքում։";
+    case "NotReadableError":
+    case "TrackStartError":
+      return "Camera-ն կամ microphone-ն արդեն օգտագործվում է այլ ծրագրի կողմից։";
+    case "OverconstrainedError":
+      return "Camera-ի պարամետրերը չեն համապատասխանում սարքի հնարավորություններին։";
+    default:
+      return "Չհաջողվեց միանալ camera/microphone-ին։";
+  }
 }
 
 const ICE_SERVERS = {
@@ -33,8 +79,41 @@ const ICE_SERVERS = {
   ],
 };
 
-function pairKey(a, b) {
-  return [a, b].sort().join("_");
+// Watches a peer connection's ICE state. Flags the call as "degraded" the
+// moment it drops, and calls onProlongedFailure if it hasn't recovered
+// within FAILURE_GRACE_MS — that's the hook that lets a caller show a
+// "reconnecting..." banner instead of a silently frozen black tile, and
+// gracefully end/drop the connection instead of hanging forever.
+const FAILURE_GRACE_MS = 8000;
+
+function watchConnectionHealth(pc, label, { onDegradedChange, onProlongedFailure }) {
+  let failureTimer = null;
+
+  pc.oniceconnectionstatechange = () => {
+    const state = pc.iceConnectionState;
+    if (DEBUG_CALLS) console.log(`[ICE:${label}]`, state);
+
+    if (state === "disconnected" || state === "failed") {
+      onDegradedChange?.(true);
+      if (!failureTimer) {
+        failureTimer = setTimeout(() => {
+          if (pc.iceConnectionState === "disconnected" || pc.iceConnectionState === "failed") {
+            onProlongedFailure?.();
+          }
+        }, FAILURE_GRACE_MS);
+      }
+    } else if (state === "connected" || state === "completed") {
+      if (failureTimer) {
+        clearTimeout(failureTimer);
+        failureTimer = null;
+      }
+      onDegradedChange?.(false);
+    }
+  };
+
+  return () => {
+    if (failureTimer) clearTimeout(failureTimer);
+  };
 }
 
 async function logOneToOneCall({ peerUid, currentUser, callType, status, durationSec }) {
@@ -43,7 +122,7 @@ async function logOneToOneCall({ peerUid, currentUser, callType, status, duratio
     await addDoc(collection(db, "chats", chatId, "messages"), {
       type: "call",
       callType,
-      callStatus: status, 
+      callStatus: status,
       durationSec: durationSec || 0,
       senderId: currentUser.uid,
       senderName: currentUser.displayName || currentUser.email || "Anonymous",
@@ -59,7 +138,7 @@ async function logGroupCallEvent({ groupId, currentUser, callType, status }) {
     await addDoc(collection(db, "groups", groupId, "messages"), {
       type: "call",
       callType,
-      callStatus: status, 
+      callStatus: status,
       senderId: currentUser.uid,
       senderName: currentUser.displayName || currentUser.email || "Anonymous",
       createdAt: serverTimestamp(),
@@ -69,21 +148,50 @@ async function logGroupCallEvent({ groupId, currentUser, callType, status }) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// useCallManager — all signaling + WebRTC state
+// ---------------------------------------------------------------------------
+
 export function useCallManager(currentUser) {
-  const [incomingCall, setIncomingCall] = useState(null); // 1:1 զանգող, ringing
-  const [activeCall, setActiveCall] = useState(null); // 1:1 ընթացիկ զանգ
-  const [activeGroupCall, setActiveGroupCall] = useState(null); // group ընթացիկ զանգ
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [activeCall, setActiveCall] = useState(null);
+  const [activeGroupCall, setActiveGroupCall] = useState(null);
 
   const [localStream, setLocalStream] = useState(null);
-  const [remoteStream, setRemoteStream] = useState(null); // 1:1 remote
-  const [groupRemoteStreams, setGroupRemoteStreams] = useState({}); // { uid: MediaStream }
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [groupRemoteStreams, setGroupRemoteStreams] = useState({});
 
   const [muted, setMuted] = useState(false);
   const [cameraOff, setCameraOff] = useState(false);
 
-  const peerConnectionRef = useRef(null); // 1:1
-  const groupPeerConnectionsRef = useRef({}); // { uid: RTCPeerConnection }
+  // In-UI replacements for alert(): a transient error banner, and a
+  // "connection is degraded somewhere" flag the overlay can show a
+  // reconnecting banner for.
+  const [callError, setCallError] = useState(null);
+  const [connectionQuality, setConnectionQuality] = useState("good"); // "good" | "degraded"
+
+  const errorTimerRef = useRef(null);
+  const showError = useCallback((msg) => {
+    setCallError(msg);
+    clearTimeout(errorTimerRef.current);
+    errorTimerRef.current = setTimeout(() => setCallError(null), 5000);
+  }, []);
+
+  const degradedSetRef = useRef(new Set());
+  const markDegraded = useCallback((key, isDegraded) => {
+    if (isDegraded) degradedSetRef.current.add(key);
+    else degradedSetRef.current.delete(key);
+    setConnectionQuality(degradedSetRef.current.size > 0 ? "degraded" : "good");
+  }, []);
+  const resetDegraded = useCallback(() => {
+    degradedSetRef.current.clear();
+    setConnectionQuality("good");
+  }, []);
+
+  const peerConnectionRef = useRef(null);
+  const groupPeerConnectionsRef = useRef({});
   const unsubscribersRef = useRef([]);
+  const healthWatchersRef = useRef([]); // cleanup fns from watchConnectionHealth
   const localStreamRef = useRef(null);
   const activeCallRef = useRef(null);
   const currentUserRef = useRef(null);
@@ -99,6 +207,8 @@ export function useCallManager(currentUser) {
   const clearUnsubs = () => {
     unsubscribersRef.current.forEach((u) => u && u());
     unsubscribersRef.current = [];
+    healthWatchersRef.current.forEach((u) => u && u());
+    healthWatchersRef.current = [];
   };
 
   const stopLocalStream = () => {
@@ -106,42 +216,46 @@ export function useCallManager(currentUser) {
     localStreamRef.current = null;
     setLocalStream(null);
   };
-  const cleanup1to1 = useCallback((reason = "ended") => {
-    const call = activeCallRef.current;
-    const user = currentUserRef.current;
 
-    if (call && user && call.role === "caller") {
-      let status;
-      let durationSec = 0;
-      if (reason === "declined") {
-        status = "declined";
-      } else if (call.status === "connected") {
-        status = "answered";
-        durationSec = call.connectedAt ? Math.round((Date.now() - call.connectedAt) / 1000) : 0;
-      } else {
-        status = "no_answer";
+  const cleanup1to1 = useCallback(
+    (reason = "ended") => {
+      const call = activeCallRef.current;
+      const user = currentUserRef.current;
+
+      if (call && user && call.role === "caller") {
+        let status;
+        let durationSec = 0;
+        if (reason === "declined") {
+          status = "declined";
+        } else if (call.status === "connected") {
+          status = "answered";
+          durationSec = call.connectedAt ? Math.round((Date.now() - call.connectedAt) / 1000) : 0;
+        } else {
+          status = "no_answer";
+        }
+        logOneToOneCall({
+          peerUid: call.peerUid,
+          currentUser: user,
+          callType: call.type,
+          status,
+          durationSec,
+        });
       }
-      logOneToOneCall({
-        peerUid: call.peerUid,
-        currentUser: user,
-        callType: call.type,
-        status,
-        durationSec,
-      });
-    }
 
-    peerConnectionRef.current?.close();
-    peerConnectionRef.current = null;
-    setActiveCall(null);
-    setIncomingCall(null);
-    setRemoteStream(null);
-    stopLocalStream();
-    clearUnsubs();
-    setMuted(false);
-    setCameraOff(false);
-  }, []);
+      peerConnectionRef.current?.close();
+      peerConnectionRef.current = null;
+      setActiveCall(null);
+      setIncomingCall(null);
+      setRemoteStream(null);
+      stopLocalStream();
+      clearUnsubs();
+      resetDegraded();
+      setMuted(false);
+      setCameraOff(false);
+    },
+    [resetDegraded]
+  );
 
-  // ---------- group cleanup ----------
   const cleanupGroup = useCallback(() => {
     Object.values(groupPeerConnectionsRef.current).forEach((pc) => pc?.close());
     groupPeerConnectionsRef.current = {};
@@ -149,9 +263,11 @@ export function useCallManager(currentUser) {
     setGroupRemoteStreams({});
     stopLocalStream();
     clearUnsubs();
+    resetDegraded();
     setMuted(false);
     setCameraOff(false);
-  }, []);
+  }, [resetDegraded]);
+
   useEffect(() => {
     if (!currentUser) return;
     const q = query(
@@ -199,10 +315,15 @@ export function useCallManager(currentUser) {
           }
         };
 
-        // ICE candidate-ները կարող են Firestore-ից հասնել ԱՌԱՋ, քան pc-ն ունի
-        // remoteDescription (answer-ը դեռ չի եկել) - այդ դեպքում addIceCandidate-ը
-        // ձախողվում է լուռ։ Այդպիսի candidate-ները հերթագրում ենք ու ավելացնում
-        // հենց remoteDescription-ը դրվի (տես flushPendingCandidates ներքևում)։
+        const stopHealthWatch = watchConnectionHealth(pc, `caller:${callDocRef.id}`, {
+          onDegradedChange: (isDegraded) => markDegraded(callDocRef.id, isDegraded),
+          onProlongedFailure: () => {
+            showError("Կապը ընդհատվեց։");
+            cleanup1to1("ended");
+          },
+        });
+        healthWatchersRef.current.push(stopHealthWatch);
+
         let pendingCandidates = [];
         const addOrQueueCandidate = (data) => {
           if (pc.remoteDescription) {
@@ -240,7 +361,7 @@ export function useCallManager(currentUser) {
             setActiveCall((prev) => (prev ? { ...prev, status: "connected", connectedAt: Date.now() } : prev));
           }
           if (data.status === "declined") {
-            alert("Զանգը մերժվեց");
+            showError("Զանգը մերժվեց։");
             cleanup1to1("declined");
           }
           if (data.status === "ended") {
@@ -262,11 +383,11 @@ export function useCallManager(currentUser) {
         unsubscribersRef.current.push(unsubDoc, unsubCandidates);
       } catch (err) {
         console.error("Զանգի սկսելու սխալ:", err);
-        alert("Չհաջողվեց սկսել զանգը, ստուգիր camera/microphone-ի permission-ները");
+        showError(mediaErrorMessage(err));
         cleanup1to1("ended");
       }
     },
-    [currentUser, cleanup1to1]
+    [currentUser, cleanup1to1, markDegraded, showError]
   );
 
   const acceptCall = useCallback(async () => {
@@ -289,6 +410,15 @@ export function useCallManager(currentUser) {
           addDoc(collection(db, "calls", id, "calleeCandidates"), e.candidate.toJSON());
         }
       };
+
+      const stopHealthWatch = watchConnectionHealth(pc, `callee:${id}`, {
+        onDegradedChange: (isDegraded) => markDegraded(id, isDegraded),
+        onProlongedFailure: () => {
+          showError("Կապը ընդհատվեց։");
+          cleanup1to1("ended");
+        },
+      });
+      healthWatchersRef.current.push(stopHealthWatch);
 
       await pc.setRemoteDescription(new RTCSessionDescription(offer));
       const answer = await pc.createAnswer();
@@ -313,9 +443,7 @@ export function useCallManager(currentUser) {
         const data = snap.data();
         if (data?.status === "ended") cleanup1to1("ended");
       });
-      // pc.setRemoteDescription(offer)-ը կատարվել է վերևում, ուստի callerCandidates-ը
-      // հիմա անվտանգ է ուղիղ ավելացնել, բայց ամեն դեպքում buffer-ով ենք անում
-      // consistency-ի համար։
+
       const unsubCandidates = onSnapshot(collection(db, "calls", id, "callerCandidates"), (snap) => {
         snap.docChanges().forEach((change) => {
           if (change.type === "added") {
@@ -326,10 +454,10 @@ export function useCallManager(currentUser) {
       unsubscribersRef.current.push(unsubDoc, unsubCandidates);
     } catch (err) {
       console.error("Զանգն ընդունելու սխալ:", err);
-      alert("Չհաջողվեց ընդունել զանգը, ստուգիր camera/microphone-ի permission-ները");
+      showError(mediaErrorMessage(err));
       cleanup1to1("ended");
     }
-  }, [incomingCall, cleanup1to1]);
+  }, [incomingCall, cleanup1to1, markDegraded, showError]);
 
   const declineCall = useCallback(async () => {
     if (!incomingCall) return;
@@ -352,7 +480,6 @@ export function useCallManager(currentUser) {
     cleanup1to1();
   }, [activeCall, cleanup1to1]);
 
-  // ================= GROUP CALL (mesh) =================
   const connectToGroupPeer = useCallback(
     (groupId, otherUid, stream) => {
       const amOfferer = currentUser.uid < otherUid;
@@ -365,6 +492,23 @@ export function useCallManager(currentUser) {
       pc.ontrack = (e) => {
         setGroupRemoteStreams((prev) => ({ ...prev, [otherUid]: e.streams[0] }));
       };
+
+      // A prolonged failure on a group peer only drops that one
+      // participant's tile — it doesn't end the call for everyone else.
+      const stopHealthWatch = watchConnectionHealth(pc, `group:${groupId}:${otherUid}`, {
+        onDegradedChange: (isDegraded) => markDegraded(`${groupId}:${otherUid}`, isDegraded),
+        onProlongedFailure: () => {
+          pc.close();
+          delete groupPeerConnectionsRef.current[otherUid];
+          setGroupRemoteStreams((prev) => {
+            const next = { ...prev };
+            delete next[otherUid];
+            return next;
+          });
+          markDegraded(`${groupId}:${otherUid}`, false);
+        },
+      });
+      healthWatchersRef.current.push(stopHealthWatch);
 
       const myCandidates = collection(
         db, "groups", groupId, "callSignals", key,
@@ -379,9 +523,6 @@ export function useCallManager(currentUser) {
         if (e.candidate) addDoc(myCandidates, e.candidate.toJSON());
       };
 
-      // Նույն race condition-ը, ինչ 1:1 զանգում. their candidate-ները հասնում
-      // են այն ինքն էլ, մինչև setRemoteDescription-ը կատարվի, ուստի հերթագրում
-      // ենք, եթե remoteDescription-ը դեռ չկա։
       let pendingCandidates = [];
       const addOrQueueCandidate = (data) => {
         if (pc.remoteDescription) {
@@ -438,7 +579,7 @@ export function useCallManager(currentUser) {
         unsubscribersRef.current.push(unsubSignal);
       }
     },
-    [currentUser]
+    [currentUser, markDegraded]
   );
 
   const joinGroupCall = useCallback(
@@ -454,8 +595,6 @@ export function useCallManager(currentUser) {
         groupPeerConnectionsRef.current = {};
         setGroupRemoteStreams({});
 
-        // Ստուգում ենք՝ արդեն կային մասնակիցներ, թե ես եմ առաջինը (call-ը հենց
-        // հիմա է սկսվում) - որ history-ում գրենք "call started" միայն մեկ անգամ։
         const existingParticipantsSnap = await getDocs(
           collection(db, "groups", group.id, "callParticipants")
         );
@@ -501,11 +640,11 @@ export function useCallManager(currentUser) {
         unsubscribersRef.current.push(unsubParticipants);
       } catch (err) {
         console.error("Group call-ին միանալու սխալ:", err);
-        alert("Չհաջողվեց միանալ զանգին, ստուգիր camera/microphone-ի permission-ները");
+        showError(mediaErrorMessage(err));
         cleanupGroup();
       }
     },
-    [currentUser, connectToGroupPeer, cleanupGroup]
+    [currentUser, connectToGroupPeer, cleanupGroup, showError]
   );
 
   const leaveGroupCall = useCallback(async () => {
@@ -530,7 +669,6 @@ export function useCallManager(currentUser) {
     cleanupGroup();
   }, [activeGroupCall, currentUser, cleanupGroup]);
 
-  // ---------- mute / camera toggle-ներ (ընդհանուր 1:1 և group-ի համար) ----------
   const toggleMute = useCallback(() => {
     if (!localStreamRef.current) return;
     const next = !muted;
@@ -545,7 +683,6 @@ export function useCallManager(currentUser) {
     setCameraOff(next);
   }, [cameraOff]);
 
-  // component unmount-ի ժամանակ մաքրում
   useEffect(() => {
     return () => {
       peerConnectionRef.current?.close();
@@ -564,6 +701,8 @@ export function useCallManager(currentUser) {
     groupRemoteStreams,
     muted,
     cameraOff,
+    callError,
+    connectionQuality,
     startCall,
     acceptCall,
     declineCall,
@@ -575,32 +714,104 @@ export function useCallManager(currentUser) {
   };
 }
 
-// ================= Video tile (local/remote stream-ը կապում է <video>-ին) =================
+// ---------------------------------------------------------------------------
+// useAudioLevel — drives the "speaking" ring around a tile's avatar
+// ---------------------------------------------------------------------------
+
+function useAudioLevel(stream, enabled = true) {
+  const [level, setLevel] = useState(0);
+
+  useEffect(() => {
+    if (!enabled || !stream || stream.getAudioTracks().length === 0) {
+      setLevel(0);
+      return;
+    }
+
+    let audioCtx;
+    let analyser;
+    let source;
+    let rafId;
+    let dataArray;
+    let lastUpdate = 0;
+    let cancelled = false;
+
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
+      source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+    } catch {
+      // AudioContext unavailable/blocked — just skip the speaking indicator.
+      return;
+    }
+
+    const tick = (t) => {
+      if (cancelled) return;
+      analyser.getByteTimeDomainData(dataArray);
+      let sumSquares = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        const v = (dataArray[i] - 128) / 128;
+        sumSquares += v * v;
+      }
+      const rms = Math.sqrt(sumSquares / dataArray.length);
+      if (t - lastUpdate > 100) {
+        setLevel(rms);
+        lastUpdate = t;
+      }
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafId);
+      try {
+        source.disconnect();
+        analyser.disconnect();
+        audioCtx.close();
+      } catch {
+        // ignore teardown errors
+      }
+    };
+  }, [stream, enabled]);
+
+  return level;
+}
+
+// ---------------------------------------------------------------------------
+// VideoTile — a single participant's video/avatar tile
+// ---------------------------------------------------------------------------
 //
-// Bug-ի fix. MediaStream-ի mej video track-y karox e avelacvel AUDIO track-its heto,
-// bayc pc.ontrack-y HER angam@ pass anum e NuYN MediaStream object-y (e.streams[0]) -
-// uti React-y state update-y "identical reference" hamarum e u re-render chi anum,
-// isk hasVideo-y mnum e stale false, texy video-y erbekh chi cuyc talis, herti hascac
-// linelov handerz. Nuynpes track.enabled-y popoxelis (toggleCamera) stream-i reference-y
-// chi popoxvum, uti UI-y chi tehsni popoxutyun@.
-//
-// Fix. VideoTile-y himav hasVideo-y pahum e sepakan state-um u lsum e MediaStream-i
-// "addtrack"/"removetrack" event-nery, isk yurakanchyur track-i "mute"/"unmute"/"ended"
-// event-nery, vor hima nranq real jamanakov force anen re-render.
-function VideoTile({ stream, muted = false, label, size = "large" }) {
+// FIXED vs the previous version: this always renders exactly one <video>
+// element (never a structurally different branch depending on hasVideo), so
+// React never remounts it — meaning srcObject never silently gets wiped out
+// when a track goes live. srcObject is only reassigned when it actually
+// changes, and AbortError from play() (caused by a superseding load, common
+// under React StrictMode's double-invoked effects in dev) is treated as
+// benign instead of logged as a failure.
+
+export function VideoTile({ stream, muted = false, label, size = "large", showSpeakingRing = true }) {
   const videoRef = useRef(null);
   const [hasVideo, setHasVideo] = useState(false);
+  const level = useAudioLevel(stream, showSpeakingRing);
+  const isSpeaking = level > 0.045;
 
   useEffect(() => {
     const el = videoRef.current;
     if (el) {
-      el.srcObject = stream || null;
+      if (el.srcObject !== (stream || null)) {
+        el.srcObject = stream || null;
+      }
       if (stream) {
-        // Ognagorcum enq bratic play() anel, vor Safari-i pes browser-ner,
-        // vory chen "autoplay"-y karkacnal component mount-i vray, sarqvi
-        // hnaravorutyan depqum sarqvi
         const playPromise = el.play();
-        if (playPromise?.catch) playPromise.catch(() => {});
+        if (playPromise?.catch) {
+          playPromise.catch((err) => {
+            if (err?.name === "AbortError") return; // superseded by a newer play() — harmless
+            console.error(`[VideoTile:${label || "?"}] play() blocked:`, err);
+          });
+        }
       }
     }
 
@@ -610,8 +821,19 @@ function VideoTile({ stream, muted = false, label, size = "large" }) {
     }
 
     const recompute = () => {
-      setHasVideo(stream.getVideoTracks().some((t) => t.enabled && t.readyState === "live"));
+      const tracks = stream.getVideoTracks();
+      if (DEBUG_CALLS) {
+        tracks.forEach((t) =>
+          console.log(
+            `[VideoTile:${label || "?"}] enabled=${t.enabled} readyState=${t.readyState} muted(webrtc)=${t.muted}`,
+            t.getSettings()
+          )
+        );
+      }
+      const hasLiveVideo = tracks.some((t) => t.enabled && t.readyState === "live" && !t.muted);
+      setHasVideo(hasLiveVideo);
     };
+
     recompute();
 
     const trackListeners = [];
@@ -632,49 +854,46 @@ function VideoTile({ stream, muted = false, label, size = "large" }) {
     stream.addEventListener("addtrack", handleAddTrack);
     stream.addEventListener("removetrack", handleRemoveTrack);
 
+    const videoEl = videoRef.current;
+    const handleLoadedMetadata = () => recompute();
+    if (videoEl) videoEl.addEventListener("loadedmetadata", handleLoadedMetadata);
+
     return () => {
       stream.removeEventListener("addtrack", handleAddTrack);
       stream.removeEventListener("removetrack", handleRemoveTrack);
+      if (videoEl) videoEl.removeEventListener("loadedmetadata", handleLoadedMetadata);
       trackListeners.forEach((track) => {
         track.removeEventListener("mute", recompute);
         track.removeEventListener("unmute", recompute);
         track.removeEventListener("ended", recompute);
       });
     };
-  }, [stream]);
+  }, [stream, label]);
 
   return (
     <div
-      className={`relative bg-[#0c2a38] rounded-xl overflow-hidden flex items-center justify-center ${
+      className={`relative rounded-2xl overflow-hidden flex items-center justify-center bg-[#0F2B3A] transition-shadow duration-150 ${
         size === "large" ? "w-full h-full" : "w-28 h-20"
-      }`}
+      } ${isSpeaking ? "ring-2 ring-[#4FD1A5]/70" : "ring-1 ring-white/5"}`}
     >
-      {hasVideo ? (
-        <video ref={videoRef} autoPlay playsInline muted={muted} className="w-full h-full object-cover" />
-      ) : (
-        <>
-          {/*
-            Chi karox enq "hidden" (display:none) class-y ognagorcel ayստeg, vorovhetev
-            Safari/WebKit-y (iOS-i bolor browser-nery) pause/suspend en anum media
-            element-nery vorery display:none en - dra hamar audio-only zangi jamanak
-            dzayny lsvats chi lini. Anti tex@ "tesanelu chapov" tex e hatkacnum, bayc
-            popokhelov ayn tesanelutyunic durs (opacity:0 + 1px chap), vor audio-y
-            sharunakum e decode-vel u hnchel.
-          */}
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted={muted}
-            className="absolute w-px h-px opacity-0 pointer-events-none"
-          />
-          <div className="w-12 h-12 rounded-full bg-[#3b6ea5] flex items-center justify-center text-white text-lg font-semibold">
-            {label ? label.slice(0, 2).toUpperCase() : "?"}
-          </div>
-        </>
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted={muted}
+        className={hasVideo ? "w-full h-full object-cover" : "absolute w-px h-px opacity-0 pointer-events-none"}
+      />
+      {!hasVideo && (
+        <div
+          className={`rounded-full bg-gradient-to-br from-[#3E7CB1] to-[#1B4B75] flex items-center justify-center text-white font-semibold ${
+            size === "large" ? "w-16 h-16 text-xl" : "w-10 h-10 text-sm"
+          }`}
+        >
+          {label ? label.slice(0, 2).toUpperCase() : "?"}
+        </div>
       )}
       {label && (
-        <span className="absolute bottom-1 left-1.5 text-[10px] text-white bg-black/40 px-1.5 py-0.5 rounded">
+        <span className="absolute bottom-1.5 left-2 text-[11px] text-white/90 bg-black/35 backdrop-blur-sm px-2 py-0.5 rounded-full">
           {label}
         </span>
       )}
@@ -682,7 +901,40 @@ function VideoTile({ stream, muted = false, label, size = "large" }) {
   );
 }
 
-// ================= Overlay UI =================
+// ---------------------------------------------------------------------------
+// CallOverlay — incoming / active 1:1 / active group call UI
+// ---------------------------------------------------------------------------
+
+function useElapsed(connectedAt) {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!connectedAt) {
+      setElapsed(0);
+      return;
+    }
+    const tick = () => setElapsed(Math.floor((Date.now() - connectedAt) / 1000));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [connectedAt]);
+  return elapsed;
+}
+
+function ControlButton({ onClick, active, title, children }) {
+  return (
+    <button
+      onClick={onClick}
+      title={title}
+      aria-label={title}
+      className={`w-12 h-12 rounded-full flex items-center justify-center text-white backdrop-blur-md transition-colors ${
+        active ? "bg-white/25" : "bg-white/10 hover:bg-white/15"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function CallOverlay({ call = {} }) {
   const {
     incomingCall,
@@ -693,6 +945,8 @@ export function CallOverlay({ call = {} }) {
     groupRemoteStreams,
     muted,
     cameraOff,
+    callError,
+    connectionQuality,
     acceptCall,
     declineCall,
     endCall,
@@ -701,146 +955,172 @@ export function CallOverlay({ call = {} }) {
     toggleCamera,
   } = call;
 
-  // --- Incoming call ringing modal ---
+  const elapsed = useElapsed(activeCall?.connectedAt);
+
+  const errorBanner = callError ? (
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[10000] bg-[#3A1416] border border-[#E14F4A]/40 text-[#FFD9D6] text-sm px-4 py-2 rounded-xl shadow-lg max-w-sm text-center">
+      {callError}
+    </div>
+  ) : null;
+
+  const reconnectingBanner =
+    connectionQuality === "degraded" && (activeCall || activeGroupCall) ? (
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[10000] bg-[#3A2E0F] border border-amber-400/40 text-amber-200 text-sm px-4 py-2 rounded-xl shadow-lg">
+        Կապն անկայուն է, փորձում ենք վերականգնել…
+      </div>
+    ) : null;
+
   if (incomingCall && !activeCall && !activeGroupCall) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl w-full max-w-xs p-6 text-center shadow-2xl">
-          <div className="w-16 h-16 mx-auto rounded-full bg-[#3b6ea5] flex items-center justify-center text-white text-2xl font-semibold animate-pulse">
-            {(incomingCall.callerName || "?").slice(0, 2).toUpperCase()}
-          </div>
-          <h2 className="mt-3 text-sm font-semibold text-gray-800">{incomingCall.callerName}</h2>
-          <p className="text-xs text-gray-400 mt-1">
-            {incomingCall.type === "video" ? "Video call..." : "Զանգում է..."}
-          </p>
-          <div className="flex justify-center gap-4 mt-5">
-            <button
-              onClick={declineCall}
-              aria-label="Decline"
-              className="w-12 h-12 rounded-full bg-[#e34234] hover:bg-[#d23528] text-white flex items-center justify-center shadow-lg"
-            >
-              <i className="fa-solid fa-phone-slash"></i>
-            </button>
-            <button
-              onClick={acceptCall}
-              aria-label="Accept"
-              className="w-12 h-12 rounded-full bg-[#2c9e6f] hover:bg-[#26875f] text-white flex items-center justify-center shadow-lg"
-            >
-              <i className="fa-solid fa-phone"></i>
-            </button>
+      <>
+        {errorBanner}
+        <div className="fixed inset-0 z-[9999] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0F2B3A] rounded-3xl w-full max-w-xs p-7 text-center shadow-2xl border border-white/5">
+            <div className="relative w-20 h-20 mx-auto">
+              <div className="absolute inset-0 rounded-full bg-[#3E7CB1]/30 animate-ping" />
+              <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-[#3E7CB1] to-[#1B4B75] flex items-center justify-center text-white text-2xl font-semibold">
+                {(incomingCall.callerName || "?").slice(0, 2).toUpperCase()}
+              </div>
+            </div>
+            <h2 className="mt-4 text-base font-semibold text-white">{incomingCall.callerName}</h2>
+            <p className="text-xs text-[#8FADB8] mt-1">
+              {incomingCall.type === "video" ? "Վիդեոզանգ…" : "Զանգում է…"}
+            </p>
+            <div className="flex justify-center gap-5 mt-6">
+              <button
+                onClick={declineCall}
+                title="Մերժել"
+                aria-label="Մերժել"
+                className="w-14 h-14 rounded-full bg-[#E14F4A] hover:bg-[#c93f3b] text-white flex items-center justify-center shadow-lg transition-colors"
+              >
+                <i className="fa-solid fa-phone-slash"></i>
+              </button>
+              <button
+                onClick={acceptCall}
+                title="Ընդունել"
+                aria-label="Ընդունել"
+                className="w-14 h-14 rounded-full bg-[#34B27A] hover:bg-[#2a9868] text-white flex items-center justify-center shadow-lg transition-colors"
+              >
+                <i className="fa-solid fa-phone"></i>
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  // --- Active 1:1 call ---
   if (activeCall) {
     const isVideo = activeCall.type === "video";
     return (
-      <div className="fixed inset-0 z-[9999] bg-[#0c2a38] flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 text-white shrink-0">
-          <span className="text-sm font-medium">
-            {activeCall.peerName} — {activeCall.status === "ringing" ? "Զանգում ենք..." : "Կապակցված"}
-          </span>
-        </div>
-
-        <div className="flex-1 relative p-4">
-          {isVideo ? (
-            <>
-              <VideoTile stream={remoteStream} label={activeCall.peerName} size="large" />
-              <div className="absolute bottom-6 right-6 w-28 h-20 rounded-xl overflow-hidden border-2 border-white/30">
-                <VideoTile stream={localStream} muted label="Դու" size="small" />
-              </div>
-            </>
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-              <div className="w-24 h-24 rounded-full bg-[#3b6ea5] flex items-center justify-center text-white text-3xl font-semibold">
-                {(activeCall.peerName || "?").slice(0, 2).toUpperCase()}
-              </div>
-              <span className="text-white text-sm">{activeCall.peerName}</span>
-              {/* audio-only remote stream-ը պետք է հնչի, ուստի hidden video tag audio-ով */}
-              <VideoTile stream={remoteStream} label="" size="small" />
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center justify-center gap-4 px-4 py-5 shrink-0">
-          <button
-            onClick={toggleMute}
-            className={`w-12 h-12 rounded-full flex items-center justify-center text-white ${
-              muted ? "bg-white/20" : "bg-white/10"
-            }`}
-          >
-            <i className={`fa-solid ${muted ? "fa-microphone-slash" : "fa-microphone"}`}></i>
-          </button>
-          {isVideo && (
-            <button
-              onClick={toggleCamera}
-              className={`w-12 h-12 rounded-full flex items-center justify-center text-white ${
-                cameraOff ? "bg-white/20" : "bg-white/10"
+      <>
+        {errorBanner}
+        {reconnectingBanner}
+        <div className="fixed inset-0 z-[9999] bg-[#08161F] flex flex-col">
+          <div className="flex items-center gap-2 px-5 py-4 text-white shrink-0">
+            <span
+              className={`w-2 h-2 rounded-full ${
+                connectionQuality === "degraded" ? "bg-amber-400" : "bg-[#34B27A]"
               }`}
+            />
+            <span className="text-sm font-medium">{activeCall.peerName}</span>
+            <span className="text-xs text-[#8FADB8]">
+              {activeCall.status === "ringing" ? "Զանգում ենք…" : formatDuration(elapsed)}
+            </span>
+          </div>
+
+          <div className="flex-1 relative px-4 pb-2">
+            {isVideo ? (
+              <>
+                <VideoTile stream={remoteStream} label={activeCall.peerName} size="large" />
+                <div className="absolute bottom-4 right-4 w-28 h-20 rounded-xl overflow-hidden border border-white/15 shadow-lg">
+                  <VideoTile stream={localStream} muted label="Դու" size="small" showSpeakingRing={false} />
+                </div>
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <VideoTile stream={remoteStream} label={activeCall.peerName} size="large" />
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center justify-center gap-4 px-4 py-6 shrink-0">
+            <ControlButton onClick={toggleMute} active={muted} title={muted ? "Միացնել ձայնը" : "Անջատել ձայնը"}>
+              <i className={`fa-solid ${muted ? "fa-microphone-slash" : "fa-microphone"}`}></i>
+            </ControlButton>
+            {isVideo && (
+              <ControlButton
+                onClick={toggleCamera}
+                active={cameraOff}
+                title={cameraOff ? "Միացնել տեսախցիկը" : "Անջատել տեսախցիկը"}
+              >
+                <i className={`fa-solid ${cameraOff ? "fa-video-slash" : "fa-video"}`}></i>
+              </ControlButton>
+            )}
+            <button
+              onClick={endCall}
+              title="Ավարտել"
+              aria-label="Ավարտել"
+              className="w-14 h-14 rounded-full bg-[#E14F4A] hover:bg-[#c93f3b] text-white flex items-center justify-center shadow-lg transition-colors"
             >
-              <i className={`fa-solid ${cameraOff ? "fa-video-slash" : "fa-video"}`}></i>
+              <i className="fa-solid fa-phone-slash"></i>
             </button>
-          )}
-          <button
-            onClick={endCall}
-            className="w-14 h-14 rounded-full bg-[#e34234] hover:bg-[#d23528] text-white flex items-center justify-center shadow-lg"
-          >
-            <i className="fa-solid fa-phone-slash"></i>
-          </button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  // --- Active group call ---
   if (activeGroupCall) {
     const isVideo = activeGroupCall.type === "video";
     const remoteEntries = Object.entries(groupRemoteStreams);
+    const total = remoteEntries.length + 1;
     return (
-      <div className="fixed inset-0 z-[9999] bg-[#0c2a38] flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 text-white shrink-0">
-          <span className="text-sm font-medium">
-            {activeGroupCall.groupName} — {remoteEntries.length + 1} մասնակից
-          </span>
-        </div>
-
-        <div className="flex-1 p-3 grid grid-cols-2 gap-2 auto-rows-fr overflow-y-auto">
-          <VideoTile stream={localStream} muted label="Դու" size="large" />
-          {remoteEntries.map(([uid, stream]) => (
-            <VideoTile key={uid} stream={stream} label={uid.slice(0, 6)} size="large" />
-          ))}
-        </div>
-
-        <div className="flex items-center justify-center gap-4 px-4 py-5 shrink-0">
-          <button
-            onClick={toggleMute}
-            className={`w-12 h-12 rounded-full flex items-center justify-center text-white ${
-              muted ? "bg-white/20" : "bg-white/10"
-            }`}
-          >
-            <i className={`fa-solid ${muted ? "fa-microphone-slash" : "fa-microphone"}`}></i>
-          </button>
-          {isVideo && (
-            <button
-              onClick={toggleCamera}
-              className={`w-12 h-12 rounded-full flex items-center justify-center text-white ${
-                cameraOff ? "bg-white/20" : "bg-white/10"
+      <>
+        {errorBanner}
+        {reconnectingBanner}
+        <div className="fixed inset-0 z-[9999] bg-[#08161F] flex flex-col">
+          <div className="flex items-center gap-2 px-5 py-4 text-white shrink-0">
+            <span
+              className={`w-2 h-2 rounded-full ${
+                connectionQuality === "degraded" ? "bg-amber-400" : "bg-[#34B27A]"
               }`}
+            />
+            <span className="text-sm font-medium">{activeGroupCall.groupName}</span>
+            <span className="text-xs text-[#8FADB8]">{total} մասնակից</span>
+          </div>
+
+          <div className={`flex-1 p-3 grid ${gridColsClass(total)} gap-2 auto-rows-fr overflow-y-auto`}>
+            <VideoTile stream={localStream} muted label="Դու" size="large" showSpeakingRing={false} />
+            {remoteEntries.map(([uid, stream]) => (
+              <VideoTile key={uid} stream={stream} label={uid.slice(0, 6)} size="large" />
+            ))}
+          </div>
+
+          <div className="flex items-center justify-center gap-4 px-4 py-6 shrink-0">
+            <ControlButton onClick={toggleMute} active={muted} title={muted ? "Միացնել ձայնը" : "Անջատել ձայնը"}>
+              <i className={`fa-solid ${muted ? "fa-microphone-slash" : "fa-microphone"}`}></i>
+            </ControlButton>
+            {isVideo && (
+              <ControlButton
+                onClick={toggleCamera}
+                active={cameraOff}
+                title={cameraOff ? "Միացնել տեսախցիկը" : "Անջատել տեսախցիկը"}
+              >
+                <i className={`fa-solid ${cameraOff ? "fa-video-slash" : "fa-video"}`}></i>
+              </ControlButton>
+            )}
+            <button
+              onClick={leaveGroupCall}
+              title="Դուրս գալ"
+              aria-label="Դուրս գալ"
+              className="w-14 h-14 rounded-full bg-[#E14F4A] hover:bg-[#c93f3b] text-white flex items-center justify-center shadow-lg transition-colors"
             >
-              <i className={`fa-solid ${cameraOff ? "fa-video-slash" : "fa-video"}`}></i>
+              <i className="fa-solid fa-phone-slash"></i>
             </button>
-          )}
-          <button
-            onClick={leaveGroupCall}
-            className="w-14 h-14 rounded-full bg-[#e34234] hover:bg-[#d23528] text-white flex items-center justify-center shadow-lg"
-          >
-            <i className="fa-solid fa-phone-slash"></i>
-          </button>
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
