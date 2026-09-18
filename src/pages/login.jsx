@@ -69,12 +69,10 @@ function Login() {
       const user = result.user;
       console.log("Google-ով մուտք գործեց:", user);
 
-      // Ստուգում ենք՝ arդեն կա՞ info/{uid} doc-ը
       const q = query(collection(db, "info"), where("uid", "==", user.uid));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        // Doc ID-ն դարձնում ենք հենց user.uid-ը (ոչ թե random addDoc ID)
         await setDoc(doc(db, "info", user.uid), {
           uid: user.uid,
           email: user.email,
@@ -118,7 +116,6 @@ function Login() {
       const userCredential = await createUserWithEmailAndPassword(auth, username, password);
       const user = userCredential.user;
 
-      // Doc ID-ն դարձնում ենք հենց user.uid-ը (ոչ թե random addDoc ID)
       await setDoc(doc(db, "info", user.uid), {
         uid: user.uid,
         email: username,
@@ -150,19 +147,21 @@ function Login() {
 
   return (
     <>
-      <div className="grid grid-cols-[30%_65%] w-full h-[100vh] gap-[5%]" >
-        <div className="">
+      {/* Փոխված է grid-ը, որ մինչև 400px և մինչև md լինի 1 սյունակով, իսկ լայն էկրաններին՝ 30% և 65% */}
+      <div className="grid grid-cols-1 md:grid-cols-[30%_65%] w-full min-h-[100vh] md:h-[100vh] gap-4 md:gap-[5%]">
+        <div className="px-4 md:px-0">
           <div
             style={{
               width: '130px',
               height: '60px',
               backgroundImage: 'url(https://www.telecomarmenia.am/img/logo-light.svg?v=1)',
-              marginLeft: '40%',
-              marginTop: '40px',
+              marginLeft: 'auto',
+              marginRight: 'auto',
             }}
+            className="md:ml-[40%] mt-[40px]"
           ></div>
 
-          <div className="w-full ml-[10%] mt-[60px] max-w-md mx-auto bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="w-full md:ml-[10%] mt-[30px] md:mt-[60px] max-w-md mx-auto bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             {authMode === 'login' ? (
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
@@ -343,9 +342,10 @@ function Login() {
           </div>
         </div>
 
-        <div className="bg-[url(https://static.tildacdn.com/tild3066-6435-4130-a662-656537366333/IMG_0167b.jpg)] bg-no-repeat bg-[length:100%_100%] flex flex-col justify-center items-center">
-          <h1 className="text-[60px] text-[#2c3843] lg:text-[60px] md:text-[52px] sm:text-[42px]">PERSONAL ACCOUNT</h1>
-          <img src="https://www.telecomarmenia.am/myaccount/img/mobile-devices.png?v=3" className='lg:w-[350px] h-[400px] md:w-[300px] h-[350px] sm:w-[250px] h-[300px]' alt="" />
+        {/* Աջ կողմի բլոկը (նկարով և տեքստով), որը մինչև 400px (և մինչև md) կդասավորվի ներքևում */}
+        <div className="bg-[url(https://static.tildacdn.com/tild3066-6435-4130-a662-656537366333/IMG_0167b.jpg)] bg-cover md:bg-[length:100%_100%] bg-no-repeat flex flex-col justify-center items-center py-10 md:py-0">
+          <h1 className="text-[32px] sm:text-[42px] md:text-[52px] lg:text-[60px] text-[#2c3843] text-center px-4">PERSONAL ACCOUNT</h1>
+          <img src="https://www.telecomarmenia.am/myaccount/img/mobile-devices.png?v=3" className='w-[200px] sm:w-[250px] md:w-[300px] lg:w-[350px] h-auto object-contain mt-4' alt="" />
         </div>
       </div>
     </>

@@ -364,37 +364,37 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="flex flex-row justify-around w-full h-[600px] bg-[#083f58] text-white max-[1100px]:h-[700px] max-[900px]:h-[850px] max-[877px]:h-[940px] max-[801px]:mt-[30px] max-[801px]:h-[500px] max-[801px]:justify-center">
-        <div className="mt-[60px] ml-[100px] max-[1100px]:ml-[50px]">
+      <footer className="flex flex-row justify-around w-full h-[600px] bg-[#083f58] text-white max-[1100px]:h-[700px] max-[900px]:h-[850px] max-[877px]:h-[940px] max-[801px]:mt-[30px] max-[801px]:h-auto max-[801px]:pb-[30px] max-[801px]:justify-center max-[801px]:px-4">
+        <div className="mt-[60px] ml-[100px] max-[1100px]:ml-[50px] max-[801px]:ml-0 max-[801px]:mt-[30px] max-[801px]:w-full max-[801px]:max-w-[340px] max-[801px]:flex max-[801px]:flex-col max-[801px]:items-center max-[801px]:text-center">
           <div
-            className="ml-[5%] w-[200px] h-[60px] bg-contain bg-no-repeat"
+            className="ml-[5%] w-[200px] h-[60px] bg-contain bg-no-repeat max-[801px]:ml-0 max-[801px]:bg-center max-[400px]:w-[160px] max-[400px]:h-[48px]"
             style={{ backgroundImage: "url(https://www.telecomarmenia.am/img/logo-light.svg?v=1)" }}
           ></div>
-          <div className="flex mt-[30px] ml-[5%] text-xl">
+          <div className="flex mt-[30px] ml-[5%] text-xl gap-4 max-[801px]:ml-0 max-[801px]:justify-center">
             <i className="fa-brands fa-facebook-f"></i>
             <i className="fa-brands fa-instagram"></i>
             <i className="fa-brands fa-youtube"></i>
           </div>
-          <div className="flex mt-[30px] ml-[5%] text-xl">
+          <div className="flex mt-[30px] ml-[5%] text-xl gap-2 items-center max-[801px]:ml-0 max-[801px]:justify-center">
             <i className="fa-solid fa-phone"></i>
             <p>100</p>
           </div>
-          <div className="flex mt-[30px] ml-[5%] text-xl">
+          <div className="flex mt-[30px] ml-[5%] text-xl gap-2 items-center max-[801px]:ml-0 max-[801px]:justify-center max-[400px]:text-base max-[400px]:break-all max-[400px]:text-center">
             <i className="fa-regular fa-envelope"></i>
             <p>info@telecomarmenia.am</p>
           </div>
-          <div className="ml-5 mt-[60px] flex text-white">
+          <div className="ml-5 mt-[60px] flex text-white max-[801px]:ml-0 max-[801px]:justify-center max-[400px]:flex-col max-[400px]:items-center max-[400px]:gap-3">
             <img
               src="https://www.telecomarmenia.am/img/redesign/qr.svg"
               alt=""
-              className="w-[100px] h-[100px]"
+              className="w-[100px] h-[100px] max-[400px]:w-[80px] max-[400px]:h-[80px]"
             />
-            <div className="ml-[10px] flex flex-col">
-              <img src="https://www.telecomarmenia.am/img/redesign/app_store.png" alt="" />
+            <div className="ml-[10px] flex flex-col max-[400px]:ml-0 max-[400px]:items-center">
+              <img src="https://www.telecomarmenia.am/img/redesign/app_store.png" alt="" className="max-[400px]:h-[36px] max-[400px]:w-auto" />
               <img
                 src="https://www.telecomarmenia.am/img/redesign/google_play.png"
                 alt=""
-                className="mt-[5px]"
+                className="mt-[5px] max-[400px]:h-[36px] max-[400px]:w-auto"
               />
             </div>
           </div>
@@ -473,7 +473,7 @@ export default function Footer() {
           setShowAdminWidget(false);
         }}
         aria-label="Open chat"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#083f58] text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-[#0c2a38] transition-colors"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#083f58] text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-[#0c2a38] transition-colors max-[400px]:w-12 max-[400px]:h-12 max-[400px]:text-xl max-[400px]:bottom-4 max-[400px]:right-4"
       >
         {showChatWidget ? (
           <span className="text-xl leading-none">✕</span>
@@ -491,7 +491,7 @@ export default function Footer() {
 
       {/* Notification popover - cuyc e talis KONKRET um-@ grel e, u tuyl e talis jnjel amen meky arandzin */}
       {isLoggedIn && !showChatWidget && notifications.length > 0 && (
-        <div className="fixed bottom-24 right-6 z-50 w-[320px] max-w-[90vw] max-h-[400px] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100">
+        <div className="fixed bottom-24 right-6 z-50 w-[320px] max-w-[90vw] max-h-[400px] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100 max-[400px]:bottom-20 max-[400px]:right-3">
           <div className="flex items-center justify-between px-4 py-2.5 bg-[#083f58] text-white shrink-0">
             <span className="text-xs font-semibold">Նոր հաղորդագրություններ</span>
             <button
@@ -556,7 +556,7 @@ export default function Footer() {
       )}
 
       {isLoggedIn && showChatWidget && (
-        <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[92vw] h-[560px] max-h-[75vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100">
+        <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[92vw] h-[560px] max-h-[75vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100 max-[400px]:bottom-20 max-[400px]:right-2 max-[400px]:max-w-[96vw]">
           <div className="flex items-center justify-between px-4 py-3 bg-[#083f58] text-white shrink-0">
             <span className="text-sm font-semibold">Messages</span>
             <button
@@ -583,7 +583,7 @@ export default function Footer() {
               setShowChatWidget(false);
             }}
             aria-label="Open admin panel"
-            className="fixed bottom-6 right-24 z-50 w-14 h-14 bg-[#e34234] text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-[#d23528] transition-colors"
+            className="fixed bottom-6 right-24 z-50 w-14 h-14 bg-[#e34234] text-white rounded-full flex items-center justify-center text-2xl shadow-lg hover:bg-[#d23528] transition-colors max-[400px]:w-12 max-[400px]:h-12 max-[400px]:text-xl max-[400px]:bottom-4 max-[400px]:right-20"
           >
             {showAdminWidget ? (
               <span className="text-xl leading-none">✕</span>
@@ -593,7 +593,7 @@ export default function Footer() {
           </button>
 
           {showAdminWidget && (
-            <div className="fixed bottom-24 right-24 z-50 w-[380px] max-w-[92vw] h-[560px] max-h-[75vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100 max-[500px]:right-6">
+            <div className="fixed bottom-24 right-24 z-50 w-[380px] max-w-[92vw] h-[560px] max-h-[75vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-gray-100 max-[500px]:right-6 max-[400px]:bottom-20 max-[400px]:right-2 max-[400px]:max-w-[96vw]">
               <div className="flex items-center justify-between px-4 py-3 bg-[#e34234] text-white shrink-0">
                 <span className="text-sm font-semibold">Admin Panel</span>
                 <button
@@ -612,8 +612,8 @@ export default function Footer() {
         </>
       )}
 
-      <div className="text-white w-full h-10 bg-[#0c2a38] flex justify-center items-center">
-        <p>© 2026 Telecom Armenia OJSC. All rights reserved. Developed by Team Solutions CJSC.</p>
+      <div className="text-white w-full min-h-10 bg-[#0c2a38] flex justify-center items-center px-4 py-2 text-center">
+        <p className="text-sm max-[480px]:text-xs">© 2026 Telecom Armenia OJSC. All rights reserved. Developed by Team Solutions CJSC.</p>
       </div>
     </>
   );
